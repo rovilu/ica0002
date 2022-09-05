@@ -24,3 +24,6 @@ Current repository belongs to TalTech course ICA0002 Infrastructure services. Th
 - `hosts`
   - added host group **web_servers**
   - added **host_one** to **web_servers** group
+
+### Removed
+- `role/test_connection` - not needed.
