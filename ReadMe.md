@@ -29,4 +29,4 @@ Current repository belongs to TalTech course ICA0002 Infrastructure services. Th
   - added **host-1** to **web_servers** group.
 
 ### Removed
-- `role/test_connection` - not needed.
+- `roles/test_connection` - not needed.
