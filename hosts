@@ -1,2 +1,4 @@
+host-1 ansible_host=193.40.156.67 ansible_port=17422 ansible_ssh_user=ubuntu
+
 [web_servers]
-host_one ansible_host=193.40.156.67 ansible_port=18522 ansible_ssh_user=ubuntu
+host-1

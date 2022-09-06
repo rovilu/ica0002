@@ -1,5 +1,4 @@
 - name: Deploy web server
-  become: yes
   hosts: web_servers
   roles:
     - users
