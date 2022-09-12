@@ -5,8 +5,17 @@
     state: latest
     update_cache: yes
 
-- name: Index page
+- name: Add uWSGI configuration for Nginx
   become: yes
   ansible.builtin.copy:
-    src: index.html
-    dest: /var/www/html/index.html
+    src: default
+    dest: /etc/nginx/sites-enabled/default
+  notify:
+    - Restart Nginx service
+
+- name: Start and enable Nginx service
+  become: yes
+  ansible.builtin.service:
+    name: nginx
+    state: started
+    enabled: yes

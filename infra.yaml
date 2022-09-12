@@ -1,5 +1,6 @@
 - name: Deploy web server
   hosts: web_servers
   roles:
-    - users
+    - agama
+    - uwsgi
     - nginx

@@ -1,0 +1,22 @@
+- name: Install uWSGI packages
+  become: yes
+  ansible.builtin.apt:
+    name: '{{ item }}'
+    update_cache: yes
+  with_items:
+    - uwsgi
+    - uwsgi-plugin-python3
+
+- name: Add uWSGI configuration for AGAMA
+  become: yes
+  ansible.builtin.copy:
+    src: agama.ini
+    dest: /etc/uwsgi/apps-enabled/agama.ini
+  notify:
+    - Restart uWSGI service
+
+- name: Start and enable uWSGI service
+  ansible.builtin.service:
+    name: uwsgi
+    state: started
+    enabled: yes
