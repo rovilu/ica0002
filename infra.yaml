@@ -1,4 +1,14 @@
-- name: Deploy web server
+- name: Initialize servers
+  hosts: all
+  roles:
+    - init
+
+- name: Deploy database servers
+  hosts: db_servers
+  roles:
+    - mysql
+
+- name: Deploy web servers
   hosts: web_servers
   roles:
     - agama

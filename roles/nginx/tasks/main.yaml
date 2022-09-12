@@ -1,11 +1,10 @@
-- name: Install Nginx
+- name: Install Nginx service
   become: yes
   ansible.builtin.apt:
     name: nginx
     state: latest
-    update_cache: yes
 
-- name: Add uWSGI configuration for Nginx
+- name: Add uWSGI configuration for Nginx service
   become: yes
   ansible.builtin.copy:
     src: default
