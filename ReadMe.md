@@ -12,15 +12,11 @@ Current repository belongs to TalTech course ICA0002 Infrastructure services. Th
 ### Added
 - `roles/`
   - `nginx/` - Nginx web server role
-    - `files/`
-      - `index.html` - index page
-    - `tasks/`
-      - `main.yaml` - main role playbook
+    - `files/index.html` - index page
+    - `tasks/main.yaml` - main role playbook
   - `users/` - required users role
-    - `tasks/`
-      - `main.yaml` - main role playbook
-    - `vars/`
-      - `main.yaml` - main variables file.
+    - `tasks/main.yaml` - main role playbook
+    - `vars/main.yaml` - main variables file.
 
 ### Changed
 - `hosts`
@@ -30,3 +26,24 @@ Current repository belongs to TalTech course ICA0002 Infrastructure services. Th
 
 ### Removed
 - `roles/test_connection` - not needed.
+
+## Lab 3
+### Added
+- `roles/`
+  - `agama/` - AGAMA application role
+    - `tasks/main.yaml` - main role playbook
+  - `uwsgi/` - uWSGI service role
+    - `files/agama.ini` - uWSGI configuration for AMAGA
+    - `handlers/main.yaml` - main handlers file
+    - `tasks/main.yaml` - main role playbook
+  - `nginx/`
+    - `files/default` - default Nginx configuration
+    - `handlers/main.yaml` - main handlers file
+
+### Changed
+ - `roles/nginx/tasks/main.yaml`
+   - removed **Index page** task
+   - added **Add uWSGI configuration for Nginx** task
+
+### Removed
+- `roles/nginx/files/index.html` - not needed.
