@@ -19,6 +19,7 @@ Current repository belongs to TalTech course ICA0002 Infrastructure services. Th
     - `vars/main.yaml` - main variables file.
 
 ### Changed
+- `infra.yaml` - removed **become** parameter
 - `hosts`
   - renamed **host_one** to **host-1**
   - added host group **web_servers**
@@ -41,6 +42,9 @@ Current repository belongs to TalTech course ICA0002 Infrastructure services. Th
     - `handlers/main.yaml` - main handlers file
 
 ### Changed
+ - `infra.yaml`
+   - removed **users** role
+   - added **agama** and **uwsgi** roles
  - `roles/nginx/tasks/main.yaml`
    - removed **Index page** task
    - added **Add uWSGI configuration for Nginx** task
@@ -92,4 +96,4 @@ Current repository belongs to TalTech course ICA0002 Infrastructure services. Th
   - added variables **allow_query**, **forwarders** and **startup_name**
 - `roles/init/tasks/main.yaml`
   - added play for stopping and disabling systemd-resolver
-  - added play for resolver configuration
+  - added play for resolver configuration.
