@@ -1,0 +1,28 @@
+- name: Install BIND 9 package
+  become: yes
+  ansible.builtin.apt:
+    name: bind9
+    state: latest
+
+- name: Start and enable BIND 9 service
+  become: yes
+  ansible.builtin.service:
+    name: bind9
+    state: started
+    enabled: yes
+
+- name: Configure BIND 9 service
+  become: yes
+  ansible.builtin.template:
+    src: named.conf
+    dest: /etc/bind/named.conf
+  notify:
+    - Restart BIND 9 service
+
+- name: Configure BIND 9 master zone
+  become: yes
+  ansible.builtin.template:
+    src: db.vilur.io
+    dest: /var/lib/bind/db.{{ startup_name }}
+  notify:
+    - Reload BIND 9 configuration
