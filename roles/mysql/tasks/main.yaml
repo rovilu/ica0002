@@ -1,11 +1,10 @@
-- name: Install MySQL required packages
+- name: Install MySQL packages
   become: yes
   ansible.builtin.apt:
-    name: '{{ item }}'
+    name:
+      - mysql-server
+      - python3-pymysql
     state: latest
-  with_items:
-    - mysql-server
-    - python3-pymysql
 
 - name: Start and enable MySQL service
   become: yes
@@ -25,14 +24,14 @@
 - name: Create MySQL database
   become: yes
   community.mysql.mysql_db:
-    name: '{{ mysql_database }}'
+    name: "{{ mysql_database }}"
     login_unix_socket: /var/run/mysqld/mysqld.sock
 
 - name: Create MySQL user
   become: yes
   community.mysql.mysql_user:
-    name: '{{ mysql_user }}'
-    password: '{{ mysql_password }}'
-    host: '%'
-    priv: '{{ mysql_database }}.*:ALL'
+    name: "{{ mysql_user }}"
+    password: "{{ mysql_password }}"
+    host: "%"
+    priv: "{{ mysql_database }}.*:ALL"
     login_unix_socket: /var/run/mysqld/mysqld.sock

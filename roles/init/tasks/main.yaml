@@ -2,16 +2,3 @@
   become: yes
   ansible.builtin.apt:
     cache_valid_time: 7200
-
-- name: Stop and disable systemd-resolved service
-  become: yes
-  ansible.builtin.service:
-    name: systemd-resolved
-    state: stopped
-    enabled: no
-
-- name: Configure resolver
-  become: yes
-  ansible.builtin.template:
-    src: resolv.conf
-    dest: /etc/resolv.conf

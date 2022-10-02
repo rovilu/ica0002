@@ -1,12 +1,9 @@
-- name: Collect hosts info
-  hosts: all
-  tasks:
-    - setup:
-
-- name: Initialize servers
+- name: Initialize hosts
   hosts: all
   roles:
+    - setup
     - init
+    - resolv
 
 - name: Deploy DNS servers
   hosts: dns_servers
@@ -24,4 +21,3 @@
     - agama
     - uwsgi
     - nginx
-

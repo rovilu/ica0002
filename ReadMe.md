@@ -2,13 +2,19 @@
 Current repository belongs to TalTech course ICA0002 Infrastructure services. The repository contains Ansible project.
 
 ## Lab 1
+Initializing Ansible repository.
+
 ### Added
 - `ansible.cfg` - Ansible configuration
 - `hosts` - Ansible inventory
 - `infra.yaml` - main project playbook
 - `roles/test_connection/tasks/main.yaml` - test connection role main playbook.
 
+---
+
 ## Lab 2
+Nginx-based web servers implementation.
+
 ### Added
 - `roles/`
   - `nginx/` - Nginx web server role
@@ -28,7 +34,11 @@ Current repository belongs to TalTech course ICA0002 Infrastructure services. Th
 ### Removed
 - `roles/test_connection` - not needed.
 
+---
+
 ## Lab 3
+AGAMA web application implementation based on uWSGI and Nginx.
+
 ### Added
 - `roles/`
   - `agama/` - AGAMA application role
@@ -52,7 +62,11 @@ Current repository belongs to TalTech course ICA0002 Infrastructure services. Th
 ### Removed
 - `roles/nginx/files/index.html` - not needed.
 
+---
+
 ## Lab 4
+MySQL-based database implementation.
+
 ### Added
 - `group_vars/all.yaml` - variables file
 - `roles/`
@@ -76,7 +90,11 @@ Current repository belongs to TalTech course ICA0002 Infrastructure services. Th
 ### Removed
 - `roles/uwsgi/files/agama.ini` - reworked to template and moved under `../templates/`.
 
+---
+
 ## Lab 5
+BIND 9-based DNS server implementation.
+
 ### Added
 - `roles/`
   - `bind/` - BIND 9 DNS service role
@@ -85,15 +103,25 @@ Current repository belongs to TalTech course ICA0002 Infrastructure services. Th
     - `templates/`
       - `db.vilur.io` - vilur.io zone configuration template
       - `named.conf` - BIND 9 configuration template
-  - `init/templates/resolv.conf` - host resolver configuration
+  - `resolv/` - resolver configuration role
+    - `tasks/main.yaml` - main role playbook
+    - `templates/resolv.conf` - resolver configuration template
+  - `setup/` - facts collector role
+    - `tasks/main.yaml` - main role playbook
 
 ### Changed
 - `infra.yaml`
-  - added play for collecting hosts info
-  - added play for **bind** role
+  - added **setup** and **resolv** roles for initial play role
 - `group_vars/all.yaml`
   - changed **mysql_host** variable IP address value to DNS name
-  - added variables **allow_query**, **forwarders** and **startup_name**
-- `roles/init/tasks/main.yaml`
-  - added play for stopping and disabling systemd-resolver
-  - added play for resolver configuration.
+  - added variables **allow_query**, **forwarders** and **startup_name**.
+
+---
+
+## Lab 6
+
+### Added
+
+### Changed
+
+### Removed

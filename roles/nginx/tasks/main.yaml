@@ -1,4 +1,4 @@
-- name: Install Nginx service
+- name: Install Nginx package
   become: yes
   ansible.builtin.apt:
     name: nginx

@@ -1,10 +1,9 @@
 - name: Install uWSGI packages
   become: yes
   ansible.builtin.apt:
-    name: '{{ item }}'
-  with_items:
-    - uwsgi
-    - uwsgi-plugin-python3
+    name:
+      - uwsgi
+      - uwsgi-plugin-python3
 
 - name: Add uWSGI configuration for AGAMA
   become: yes
