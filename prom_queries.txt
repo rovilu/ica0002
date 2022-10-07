@@ -1,0 +1,2 @@
+(1 - avg by (instance) (rate(node_cpu_seconds_total{job="linux"}[1m]))) * 100
+(1 - avg by (instance) (rate(node_memory_MemFree_bytes{job="linux"}[1m]) / 1024 ^ 3)) * 100

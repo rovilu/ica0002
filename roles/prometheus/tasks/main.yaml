@@ -1,0 +1,36 @@
+- name: Install Prometheus package
+  become: yes
+  ansible.builtin.apt:
+    name: prometheus
+    state: latest
+
+- name: Configure Nginx for Prometheus
+  become: yes
+  ansible.builtin.copy:
+    src: default
+    dest: /etc/nginx/sites-enabled/default
+  notify:
+    - Restart Nginx service
+
+- name: Configure Prometheus service
+  become: yes
+  ansible.builtin.template:
+    src: prometheus.yml
+    dest: /etc/prometheus/prometheus.yml
+  notify:
+    - Restart Prometheus service
+
+- name: Expose Prometheus service
+  become: yes
+  ansible.builtin.template:
+    src: prometheus
+    dest: /etc/default/prometheus
+  notify:
+    - Restart Prometheus service
+
+- name: Enable and start Prometheus service
+  become: yes
+  ansible.builtin.service:
+    name: prometheus
+    state: started
+    enabled: yes

@@ -3,12 +3,17 @@
   roles:
     - setup
     - init
-    - resolv
 
 - name: Deploy DNS servers
   hosts: dns_servers
   roles:
     - bind
+
+- name: Configure hosts
+  hosts: all
+  roles:
+    - resolv
+    - node_exporter
 
 - name: Deploy database servers
   hosts: db_servers
@@ -18,6 +23,10 @@
 - name: Deploy web servers
   hosts: web_servers
   roles:
-    - agama
     - uwsgi
-    - nginx
+    - agama
+
+- name: Deploy monitoring server
+  hosts: monitoring_servers
+  roles:
+    - prometheus

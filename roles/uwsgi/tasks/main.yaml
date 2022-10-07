@@ -5,6 +5,14 @@
       - uwsgi
       - uwsgi-plugin-python3
 
+- name: Add uWSGI configuration for Nginx service
+  become: yes
+  ansible.builtin.copy:
+    src: default
+    dest: /etc/nginx/sites-enabled/default
+  notify:
+    - Restart Nginx service
+
 - name: Add uWSGI configuration for AGAMA
   become: yes
   ansible.builtin.template:
