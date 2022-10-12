@@ -4,6 +4,14 @@
     name: nginx
     state: latest
 
+- name: Configure Nginx enabled sites
+  become: yes
+  ansible.builtin.template:
+    src: default
+    dest: /etc/nginx/sites-enabled/default
+  notify:
+    - Restart Nginx service
+
 - name: Start and enable Nginx service
   become: yes
   ansible.builtin.service:

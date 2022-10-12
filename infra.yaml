@@ -8,6 +8,7 @@
   hosts: dns_servers
   roles:
     - bind
+    - bind_exporter
 
 - name: Configure hosts
   hosts: all
@@ -15,10 +16,17 @@
     - resolv
     - node_exporter
 
+- name: Deploy Nginx servers
+  hosts: nginx_servers
+  roles:
+    - nginx
+    - nginx_exporter
+
 - name: Deploy database servers
   hosts: db_servers
   roles:
     - mysql
+    - mysql_exporter
 
 - name: Deploy web servers
   hosts: web_servers
@@ -26,7 +34,8 @@
     - uwsgi
     - agama
 
-- name: Deploy monitoring server
+- name: Deploy monitoring servers
   hosts: monitoring_servers
   roles:
     - prometheus
+    - grafana

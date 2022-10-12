@@ -1,2 +1,12 @@
-(1 - avg by (instance) (rate(node_cpu_seconds_total{job="linux"}[1m]))) * 100
-(1 - avg by (instance) (rate(node_memory_MemFree_bytes{job="linux"}[1m]) / 1024 ^ 3)) * 100
+100 - (avg(irate(node_cpu_seconds_total{job="linux"}[1m])) * 100)
+100 * (1 - ((avg_over_time(node_memory_MemFree_bytes[1m]) + avg_over_time(node_memory_Cached_bytes[1m]) + avg_over_time(node_memory_Buffers_bytes[1m])) / avg_over_time(node_memory_MemTotal_bytes[1m])))
+
+bind_up
+irate(bind_resolver_queries_total{type="NS"}[1m])
+
+mysql_up
+irate(mysql_global_status_commands_total{command="select"}[1m])
+
+nginx_up
+irate(nginx_http_requests_total[1m])
+

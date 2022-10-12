@@ -1,1 +1,1 @@
-ARGS="--web.external-url=http://{{ prometheus_host }}:{{ prometheus_port }}/prometheus"
+ARGS="--web.external-url=http://{{ prometheus_host }}:{{ prometheus_host_port }}/prometheus"

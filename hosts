@@ -1,5 +1,5 @@
-rovilu-1 ansible_host=193.40.156.67 ansible_port=11622 ansible_ssh_user=ubuntu
-rovilu-2 ansible_host=193.40.156.67 ansible_port=37822 ansible_ssh_user=ubuntu
+rovilu-1 ansible_host=193.40.156.67 ansible_port=12122 ansible_ssh_user=ubuntu
+rovilu-2 ansible_host=193.40.156.67 ansible_port=26922 ansible_ssh_user=ubuntu
 rovilu-3 ansible_host=193.40.156.67 ansible_port=12456 ansible_ssh_user=ubuntu
 
 [web_servers]
@@ -13,3 +13,7 @@ rovilu-2
 
 [monitoring_servers]
 rovilu-2
+
+[nginx_servers:children]
+web_servers
+monitoring_servers

@@ -4,14 +4,6 @@
     name: prometheus
     state: latest
 
-- name: Configure Nginx for Prometheus
-  become: yes
-  ansible.builtin.copy:
-    src: default
-    dest: /etc/nginx/sites-enabled/default
-  notify:
-    - Restart Nginx service
-
 - name: Configure Prometheus service
   become: yes
   ansible.builtin.template:

@@ -1,0 +1,70 @@
+- name: Install required packages
+  become: yes
+  ansible.builtin.apt:
+    name:
+      - apt-transport-https
+      - software-properties-common
+    state: latest
+
+- name: Add Grafana APT key
+  become: yes
+  ansible.builtin.apt_key:
+    url: https://packages.grafana.com/gpg.key
+    state: present
+
+- name: Add Grafana APT repositories
+  become: yes
+  ansible.builtin.apt_repository:
+    repo: deb https://packages.grafana.com/oss/deb stable main
+    state: present
+
+- name: Install Grafana package
+  become: yes
+  ansible.builtin.apt:
+    name: grafana
+    state: latest
+
+- name: Configure Grafana service
+  become: yes
+  ansible.builtin.template:
+    src: grafana.ini
+    dest: /etc/grafana/grafana.ini
+  notify:
+    - Restart Grafana service
+
+- name: Start and enable Grafana service
+  become: yes
+  ansible.builtin.service:
+    name: grafana-server
+    state: started
+    enabled: yes
+
+- name: Create Prometheus datasource
+  become: yes
+  ansible.builtin.template:
+    src: datasource-prometheus.yml
+    dest: /etc/grafana/provisioning/datasources/datasource-prometheus.yml
+  notify:
+    - Restart Grafana service
+
+- name: Create Grafana dashboard
+  become: yes
+  ansible.builtin.template:
+    src: dashboard-main.yml
+    dest: /etc/grafana/provisioning/dashboards/dashboard-main.yml
+  notify:
+    - Restart Grafana service
+
+- name: Ensure Grafana dashboards directory exists
+  become: yes
+  ansible.builtin.file:
+    path: /var/lib/grafana/dashboards
+    state: directory
+
+- name: Import Grafana dashboard
+  become: yes
+  ansible.builtin.copy:
+    src: dashboard-main.json
+    dest: /var/lib/grafana/dashboards/dashboard-main.json
+  notify:
+    - Restart Grafana service
