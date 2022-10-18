@@ -1,5 +1,4 @@
 - name: Create required users
-  become: yes
   ansible.builtin.user:
     name: "{{ item.login }}"
     create_home: yes
@@ -9,7 +8,6 @@
     - "{{ users }}"
 
 - name: Add required users SSH pubkeys
-  become: yes
   ansible.posix.authorized_key:
     user: "{{ item.login }}"
     key: "{{ item.pubkey }}"

@@ -1,5 +1,4 @@
 - name: Install MySQL packages
-  become: yes
   ansible.builtin.apt:
     name:
       - mysql-server
@@ -7,14 +6,12 @@
     state: latest
 
 - name: Start and enable MySQL service
-  become: yes
   ansible.builtin.service:
     name: mysql
     state: started
     enabled: yes
 
 - name: Configure MySQL service
-  become: yes
   ansible.builtin.copy:
     src: override.cnf
     dest: /etc/mysql/mysql.conf.d/override.cnf
@@ -22,16 +19,16 @@
     - Restart MySQL service
 
 - name: Create MySQL database
-  become: yes
   community.mysql.mysql_db:
     name: "{{ mysql_database }}"
     login_unix_socket: /var/run/mysqld/mysqld.sock
 
 - name: Create MySQL user
-  become: yes
   community.mysql.mysql_user:
     name: "{{ mysql_user }}"
     password: "{{ mysql_password }}"
     host: "%"
     priv: "{{ mysql_database }}.*:ALL"
     login_unix_socket: /var/run/mysqld/mysqld.sock
+  notify:
+    - Restart MySQL service

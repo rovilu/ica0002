@@ -1,11 +1,9 @@
 - name: Install Prometheus MySQL Exporter package
-  become: yes
   ansible.builtin.apt:
     name: prometheus-mysqld-exporter
     state: latest
 
 - name: Create MySQL user for Prometheus MySQL Exporter
-  become: yes
   community.mysql.mysql_user:
     name: "{{ prometheus_user }}"
     password: "{{ mysql_exporter_password }}"
@@ -16,7 +14,6 @@
     login_unix_socket: /var/run/mysqld/mysqld.sock
 
 - name: Configure Prometheus MySQL Exporter service
-  become: yes
   ansible.builtin.template:
     src: .mysqld_exporter.cnf
     dest: /etc/.mysqld_exporter.cnf
@@ -26,7 +23,6 @@
     - Restart Prometheus MySQL Exporter service
 
 - name: Expose Prometheus MySQL Exporter service
-  become: yes
   ansible.builtin.template:
     src: prometheus-mysqld-exporter
     dest: /etc/default/prometheus-mysqld-exporter
@@ -34,7 +30,6 @@
     - Restart Prometheus MySQL Exporter service
 
 - name: Start and enable Prometheus MySQL Exporter service
-  become: yes
   ansible.builtin.service:
     name: prometheus-mysqld-exporter
     state: started

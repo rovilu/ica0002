@@ -1,11 +1,9 @@
 - name: Configure hosts resolver
-  become: yes
   ansible.builtin.template:
     src: resolv.conf
     dest: /etc/resolv.conf
 
 - name: Stop and disable hosts systemd-resolved service
-  become: yes
   ansible.builtin.service:
     name: systemd-resolved
     state: stopped

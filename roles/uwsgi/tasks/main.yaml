@@ -1,12 +1,10 @@
 - name: Install uWSGI packages
-  become: yes
   ansible.builtin.apt:
     name:
       - uwsgi
       - uwsgi-plugin-python3
 
 - name: Add uWSGI configuration for AGAMA
-  become: yes
   ansible.builtin.template:
     src: agama.ini
     dest: /etc/uwsgi/apps-enabled/agama.ini

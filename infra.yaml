@@ -15,6 +15,7 @@
   roles:
     - resolv
     - node_exporter
+    - rsyslog
 
 - name: Deploy Nginx servers
   hosts: nginx_servers
@@ -39,3 +40,6 @@
   roles:
     - prometheus
     - grafana
+    - influxdb
+    - pinger
+    - influxdb_exporter
