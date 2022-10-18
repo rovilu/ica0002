@@ -1,0 +1,11 @@
+[Unit]
+Description=
+Documentation=
+After=network-online.target
+
+[Service]
+User={{ prometheus_user }}
+ExecStart=/usr/local/bin/prometheus-influxdb-stats-exporter
+
+[Install]
+WantedBy=multi-user.target

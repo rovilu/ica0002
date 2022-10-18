@@ -1,0 +1,11 @@
+[Unit]
+Description=
+Documentation=
+After=network-online.target
+
+[Service]
+User={{ pinger_user }}
+ExecStart=/usr/local/bin/pinger
+
+[Install]
+WantedBy=multi-user.target
