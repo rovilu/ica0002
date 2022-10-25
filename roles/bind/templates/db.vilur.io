@@ -13,4 +13,5 @@ $ORIGIN {{ domain }}.   ; base domain name
                 IN	NS	rovilu-2.{{ domain }}.
 rovilu-1	    IN	A   {{ hostvars['rovilu-1']['ansible_default_ipv4']['address'] }}
 rovilu-2	    IN	A   {{ hostvars['rovilu-2']['ansible_default_ipv4']['address'] }}
+backup          IN  A   {{ backup_server_ip }}
 ;

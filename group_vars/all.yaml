@@ -18,6 +18,10 @@ domain: vilur.io
 allow_query: 192.168.42.0/23; 127.0.0.0/8;
 forwarders: 1.1.1.1; 8.8.8.8; 9.9.9.9; 9.9.9.10;
 
+backup_server_ip: 192.168.42.132
+backup_server_ssh_key: ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIEu6pFFWyuRrl4WGFPQGElYN9txwTGm2wSntcpVAaN90
+
+
 monitoring_host: "{{ hostvars['rovilu-2']['ansible_host'] }}"
 monitoring_port: 26980
 

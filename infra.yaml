@@ -3,6 +3,7 @@
   roles:
     - setup
     - init
+    - backup
 
 - name: Deploy DNS servers
   hosts: dns_servers

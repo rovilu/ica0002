@@ -9,15 +9,6 @@
   notify:
     - Restart InfluxDB service
 
-- name: Start and enable InfluxDB service
-  ansible.builtin.service:
-    name: "{{ item }}"
-    state: started
-    enabled: yes
-  with_items:
-    - telegraf
-    - influxdb
-
 - name: Add Telegraf APT key
   ansible.builtin.apt_key:
     url: https://repos.influxdata.com/influxdb.key
@@ -42,3 +33,12 @@
     dest: /etc/telegraf/telegraf.conf
   notify:
     - Restart Telegraf service
+
+- name: Start and enable InfluxDB and Telegraf services
+  ansible.builtin.service:
+    name: "{{ item }}"
+    state: started
+    enabled: yes
+  with_items:
+    - telegraf
+    - influxdb

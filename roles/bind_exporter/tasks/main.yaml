@@ -3,12 +3,12 @@
     name: prometheus-bind-exporter
     state: latest
 
-- name: Expose Prometheus Bind Exporter service
+- name: Expose Prometheus BIND Exporter service
   ansible.builtin.template:
     src: prometheus-bind-exporter
     dest: /etc/default/prometheus-bind-exporter
   notify:
-    - Restart Prometheus Bind Exporter service
+    - Restart Prometheus BIND Exporter service
 
 - name: Start and enable Prometheus BIND Exporter service
   ansible.builtin.service:
