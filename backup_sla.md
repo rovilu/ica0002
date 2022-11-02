@@ -41,17 +41,14 @@ The access to service and data must be able to be regained within 2 hours since 
 
 
 ## Versioning and retention
-Backup is valuable within 28 days since the first version. Backup is conducted every week on Wednesday.
-According to retention and backup intervals there are 4 versions of single backup.
+Backup is valuable within 7 days since the first version. Full backup is conducted every week on Sunday 00:00.
+Incremental backup is conducted on Monday to Saturday 00:00.
+According to retention and backup intervals there are 7 versions of single backup.
 
 
 ## Backup usability check
 In order to verify usability of backup, the following checks must be conducted:
 1) Backup created in time predefined to its version
-   1) Version 1 - 1st day of backup retention cycle
-   2) Version 2 - 8th day
-   3) Version 3 - 15th day
-   4) Version 4 - 22nd day
 2) Backup is readable and ready to be used. Use test server to conduct test recovery
 3) Backup is compatible with infrastructure services and applications.
 Use test server to check if data from backup can be used by serviced and applications.

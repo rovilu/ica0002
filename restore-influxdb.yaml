@@ -1,0 +1,10 @@
+- name: Restore MySQL database
+  hosts: monitoring_servers
+  ansible.builtin.shell: |
+    duplicity --no-encryption restore \
+      rsync://{{ backup_host_user }}@{{ backup_host_fqdn }}/influxdb \
+      {{ backup_user_home_restore_influxdb }}
+    service telegraf stop
+    influx -execute 'DROP DATABASE {{ influxdb_db }}'
+    influxd restore -portable -database {{ influxdb_db }} {{ backup_user_home_restore_influxdb }}
+    service telegraf start

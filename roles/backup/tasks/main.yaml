@@ -1,15 +1,26 @@
 - name: Create backup user
   ansible.builtin.user:
-    name: backup
+    name: "{{ backup_user }}"
     state: present
     create_home: yes
-    home: /home/backup
+    home: "{{ backup_user_home }}"
     generate_ssh_key: yes
     ssh_key_file: .ssh/id_rsa
 
 - name: Add backup server SSH key to known hosts list
   ansible.builtin.known_hosts:
-    name: backup.{{ domain }}
-    key: backup,backup.{{ domain }},{{ backup_server_ip }} {{ backup_server_ssh_key }}
-    path: /home/backup/.ssh/known_hosts
+    name: "{{ backup_host }}.{{ bind_domain }}"
+    key: "{{ backup_host }},{{ backup_host_fqdn }},{{ backup_host_ip }} {{ backup_host_ssh_key }}"
+    path: "{{ backup_user_home }}/.ssh/known_hosts"
+    state: present
+
+- name: Create restore directory
+  ansible.builtin.file:
+    path: "{{ backup_user_home_restore }}"
+    state: directory
+    owner: "{{ backup_user }}"
+
+- name: Install Duplicity package
+  ansible.builtin.apt:
+    name: duplicity
     state: present

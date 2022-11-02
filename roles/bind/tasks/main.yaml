@@ -18,7 +18,7 @@
 
 - name: Configure BIND 9 master zone
   ansible.builtin.template:
-    src: db.{{ domain }}
-    dest: /var/lib/bind/db.{{ domain }}
+    src: db.{{ bind_domain }}
+    dest: /var/lib/bind/db.{{ bind_domain }}
   notify:
     - Reload BIND 9 configuration

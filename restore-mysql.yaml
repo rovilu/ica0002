@@ -1,0 +1,7 @@
+- name: Restore MySQL database
+  hosts: db_servers
+  ansible.builtin.shell: |
+    duplicity --no-encryption restore \
+      rsync://{{ backup_host_user }}@{{ backup_host_fqdn }}/mysql \
+      {{ backup_user_home_restore_mysql }}
+    mysql {{ mysql_db }} < {{ backup_user_home_restore_mysql }}/{{ mysql_db }}.sql

@@ -1,0 +1,25 @@
+- name: Create InfluxDB backup directory
+  ansible.builtin.file:
+    path: "{{ backup_user_home_influxdb }}"
+    state: directory
+    owner: "{{ backup_user }}"
+
+- name: Schedule InfluxDB incremental backup
+  ansible.builtin.cron:
+    name: InfluxDB database incremental backup
+    weekday: "1-6"
+    hour: "0"
+    user: "{{ backup_user }}"
+    job: "{{ backup_influxdb_job }}"
+    cron_file: "{{ backup_influxdb_cron_file }}"
+  with_items: incremental
+
+- name: Schedule InfluxDB full backup
+  ansible.builtin.cron:
+    name: InfluxDB database full backup
+    weekday: "0"
+    hour: "0"
+    user: "{{ backup_user }}"
+    job: "{{ backup_influxdb_job }}"
+    cron_file: "{{ backup_influxdb_cron_file }}"
+  with_items: full

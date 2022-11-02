@@ -1,0 +1,44 @@
+- name: Create MySQL backup directory
+  ansible.builtin.file:
+    path: "{{ backup_user_home_mysql }}"
+    state: directory
+    owner: "{{ backup_user }}"
+
+- name: Create MySQL user for backup
+  community.mysql.mysql_user:
+    name: "{{ backup_user }}"
+    password: "{{ backup_password }}"
+    host: "%"
+    priv: "{{ mysql_db }}.*:LOCK TABLES,SELECT"
+    login_unix_socket: "{{ mysql_socket }}"
+  notify:
+    - Restart MySQL service
+
+- name: Configure MySQL client for backup
+  ansible.builtin.template:
+    src: .my.cnf
+    dest: "{{ backup_user_home }}/.my.cnf"
+    mode: 0600
+    owner: "{{ backup_user }}"
+  notify:
+    - Restart MySQL service
+
+- name: Schedule MySQL incremental backup
+  ansible.builtin.cron:
+    name: MySQL database incremental backup
+    weekday: "1-6"
+    hour: "0"
+    user: "{{ backup_user }}"
+    job: "{{ backup_mysql_job }}"
+    cron_file: "{{ backup_mysql_cron_file }}"
+  with_items: incremental
+
+- name: Schedule MySQL full backup
+  ansible.builtin.cron:
+    name: MySQL database full backup
+    weekday: "0"
+    hour: "0"
+    user: "{{ backup_user }}"
+    job: "{{ backup_mysql_job }}"
+    cron_file: "{{ backup_mysql_cron_file }}"
+  with_items: full

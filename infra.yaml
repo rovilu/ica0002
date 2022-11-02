@@ -28,6 +28,7 @@
   hosts: db_servers
   roles:
     - mysql
+    - mysql_backup
     - mysql_exporter
 
 - name: Deploy web servers
@@ -42,5 +43,6 @@
     - prometheus
     - grafana
     - influxdb
+    - influxdb_backup
     - pinger
     - influxdb_exporter

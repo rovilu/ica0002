@@ -11,7 +11,7 @@
     state: started
     enabled: yes
 
-- name: Configure MySQL service
+- name: Configure MySQL daemon
   ansible.builtin.copy:
     src: override.cnf
     dest: /etc/mysql/mysql.conf.d/override.cnf
@@ -20,15 +20,15 @@
 
 - name: Create MySQL database
   community.mysql.mysql_db:
-    name: "{{ mysql_database }}"
-    login_unix_socket: /var/run/mysqld/mysqld.sock
+    name: "{{ mysql_db }}"
+    login_unix_socket: "{{ mysql_socket }}"
 
 - name: Create MySQL user
   community.mysql.mysql_user:
     name: "{{ mysql_user }}"
     password: "{{ mysql_password }}"
     host: "%"
-    priv: "{{ mysql_database }}.*:ALL"
-    login_unix_socket: /var/run/mysqld/mysqld.sock
+    priv: "{{ mysql_db }}.*:ALL"
+    login_unix_socket: "{{ mysql_socket }}"
   notify:
     - Restart MySQL service
