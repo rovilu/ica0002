@@ -1,6 +1,5 @@
 nginx_port: 80
 nginx_sites_dir: /etc/nginx/sites-enabled
-
 uwsgi_port: 5000
 
 mysql_host: rovilu-2.{{ bind_domain }}
@@ -15,11 +14,11 @@ mysql_password: !vault |
   61613235326263643338623264333961643838643562326535313439376634376237
 mysql_socket: /var/run/mysqld/mysqld.sock
 
-cron_dir: /etc/cron.d
-
 bind_domain: vilur.io
 bind_allow_query: 192.168.42.0/23; 127.0.0.0/8;
 bind_forwarders: 1.1.1.1; 8.8.8.8; 9.9.9.9; 9.9.9.10;
+
+cron_dir: /etc/cron.d
 
 backup_host_ip: 192.168.42.132
 backup_host: backup
@@ -33,7 +32,6 @@ backup_user_home_restore: "{{ backup_user_home }}/restore"
 backup_user_home_influxdb: "{{ backup_user_home }}/influxdb"
 backup_user_home_restore_mysql: "{{ backup_user_home_restore }}/mysql"
 backup_user_home_restore_influxdb: "{{ backup_user_home_restore }}/influxdb"
-
 backup_password: !vault |
   $ANSIBLE_VAULT;1.1;AES256
   30333539306632386436303835666532623763383931303336353964363634653861343338396338
@@ -43,7 +41,7 @@ backup_password: !vault |
   63346133333565653634396166313866613466313065306238316665316130363536653430356430
   3530313262303864356139356539366533336532376631613231
 backup_mysql_cron_file: "{{ cron_dir }}/mysql-backup"
-backup_mysql_dump: mysqldump {{ mysql_db }} > {{ backup_user_home_mysql }}/{{ mysql_db }}.sql
+backup_mysql_dump: rm -rf {{ backup_user_home_mysql }}/* && mysqldump {{ mysql_db }} > {{ backup_user_home_mysql }}/{{ mysql_db }}.sql
 backup_mysql_job: "{{ backup_mysql_dump }} && duplicity --no-encryption {{ item }} {{ backup_user_home_mysql }} rsync://{{ backup_host_user }}@{{ backup_host_fqdn }}/mysql"
 backup_influxdb_cron_file: "{{ cron_dir }}/influxdb-backup"
 backup_influxdb_dump: rm -rf {{ backup_user_home_influxdb }}/* && influxd backup -portable -database {{ influxdb_db }} {{ backup_user_home_influxdb }}
@@ -70,11 +68,8 @@ grafana_password: !vault |
   61613032326235653233323235303063623866623638343934653262636665353031
 
 node_exporter_port: 9100
-
 nginx_exporter_port: 9113
-
 bind_exporter_port: 9119
-
 mysql_exporter_port: 9104
 mysql_exporter_password: !vault |
   $ANSIBLE_VAULT;1.1;AES256
@@ -83,10 +78,7 @@ mysql_exporter_password: !vault |
   38623130633261386331393832343632646637616139306230623431323466633439323434613763
   3633616463363033660a303962653237383734323962383763343639633834623061353334626630
   63663765363765386339343635623537333864626165613563303864666366363938
-
 pinger_user: pinger
-
 influxdb_db: telegraf
 influxdb_port: 8086
-
 syslog_port: 6514

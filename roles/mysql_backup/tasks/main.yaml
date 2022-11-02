@@ -4,6 +4,12 @@
     state: directory
     owner: "{{ backup_user }}"
 
+- name: Create MySQL restore directory
+  ansible.builtin.file:
+    path: "{{ backup_user_home_restore_mysql }}"
+    state: directory
+    owner: "{{ backup_user }}"
+
 - name: Create MySQL user for backup
   community.mysql.mysql_user:
     name: "{{ backup_user }}"

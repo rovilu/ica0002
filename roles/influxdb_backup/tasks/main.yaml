@@ -4,6 +4,12 @@
     state: directory
     owner: "{{ backup_user }}"
 
+- name: Create InfluxDB restore directory
+  ansible.builtin.file:
+    path: "{{ backup_user_home_restore_influxdb }}"
+    state: directory
+    owner: "{{ backup_user }}"
+
 - name: Schedule InfluxDB incremental backup
   ansible.builtin.cron:
     name: InfluxDB database incremental backup
