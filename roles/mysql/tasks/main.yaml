@@ -9,10 +9,10 @@
   ansible.builtin.service:
     name: mysql
     state: started
-    enabled: yes
+    enabled: true
 
 - name: Configure MySQL daemon
-  ansible.builtin.copy:
+  ansible.builtin.template:
     src: override.cnf
     dest: /etc/mysql/mysql.conf.d/override.cnf
   notify:
@@ -20,15 +20,38 @@
 
 - name: Create MySQL database
   community.mysql.mysql_db:
-    name: "{{ mysql_db }}"
+    name: "{{ mysql_agama_db }}"
     login_unix_socket: "{{ mysql_socket }}"
+  notify:
+    - Reset MySQL source
+    - Reset MySQL replica
 
-- name: Create MySQL user
+- name: Create MySQL user for AGAMA
   community.mysql.mysql_user:
-    name: "{{ mysql_user }}"
-    password: "{{ mysql_password }}"
+    name: "{{ mysql_agama_user }}"
+    password: "{{ mysql_agama_password }}"
     host: "%"
-    priv: "{{ mysql_db }}.*:ALL"
+    priv: "{{ mysql_agama_db }}.*:ALL"
     login_unix_socket: "{{ mysql_socket }}"
   notify:
     - Restart MySQL service
+
+- name: Create MySQL user for replication
+  community.mysql.mysql_user:
+    name: "{{ mysql_replication_user }}"
+    password: "{{ mysql_replication_password }}"
+    host: "%"
+    priv: "*.*:REPLICATION SLAVE"
+    login_unix_socket: "{{ mysql_socket }}"
+  notify:
+    - Restart MySQL service
+
+- name: Set MySQL server modes
+  community.mysql.mysql_variables:
+    variable: read_only
+    value: "{{ 'OFF' if inventory_hostname == mysql_host else 'ON' }}"
+    mode: persist
+    login_unix_socket: "{{ mysql_socket }}"
+  notify:
+    - Reset MySQL source
+    - Reset MySQL replica

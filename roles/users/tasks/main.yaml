@@ -1,7 +1,7 @@
 - name: Create required users
   ansible.builtin.user:
     name: "{{ item.login }}"
-    create_home: yes
+    create_home: true
     groups: sudo
     state: present
   with_items:

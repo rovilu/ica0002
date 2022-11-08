@@ -2,10 +2,10 @@ nginx_port: 80
 nginx_sites_dir: /etc/nginx/sites-enabled
 uwsgi_port: 5000
 
-mysql_host: rovilu-2.{{ bind_domain }}
-mysql_db: agama
-mysql_user: agama
-mysql_password: !vault |
+mysql_host: rovilu-2
+mysql_agama_db: agama
+mysql_agama_user: agama
+mysql_agama_password: !vault |
   $ANSIBLE_VAULT;1.1;AES256
   65613734633365323836663139326364633733333034336535363631656334356463333932653635
   6666656430313635643733306462326332366566616639660a326564666166373564326237353038
@@ -13,6 +13,17 @@ mysql_password: !vault |
   3935393663383733620a366539343836623764343633313465613861356631376433323666306535
   61613235326263643338623264333961643838643562326535313439376634376237
 mysql_socket: /var/run/mysqld/mysqld.sock
+mysql_replication_user: replication
+mysql_replication_password: !vault |
+  $ANSIBLE_VAULT;1.1;AES256
+  30386464656434326662346436303836376630663337633666386636303064346138343863643135
+  3265386236306231653861613361663036343865643331300a303332636265346262633864393763
+  62303765616335336135643335653566363436626239306465346266623164636231616532636338
+  3361316564656161350a393836656536343639373861636462376239323366636666663431656132
+  65353161353630613436363763313536333262363762656537643836366134633764343562356662
+  3064333030626638643033623439376465346364613331346464
+mysql_backup_host: "{{ groups['db_servers'] | reject('eq', mysql_host) | first | default(mysql_host) }}"
+node_id: "{{ (ansible_port / 100) | int }}"
 
 bind_domain: vilur.io
 bind_allow_query: 192.168.42.0/23; 127.0.0.0/8;
@@ -22,6 +33,7 @@ cron_dir: /etc/cron.d
 
 backup_host_ip: 192.168.42.132
 backup_host: backup
+
 backup_host_fqdn: "{{ backup_host }}.{{ bind_domain }}"
 backup_host_ssh_key: ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIEu6pFFWyuRrl4WGFPQGElYN9txwTGm2wSntcpVAaN90
 backup_host_user: rovilu
@@ -48,7 +60,7 @@ backup_influxdb_dump: rm -rf {{ backup_user_home_influxdb }}/* && influxd backup
 backup_influxdb_job: "{{ backup_influxdb_dump }} && duplicity --no-encryption {{ item }} {{ backup_user_home_influxdb }} rsync://{{ backup_host_user }}@{{ backup_host_fqdn }}/influxdb"
 
 monitoring_host: "{{ hostvars['rovilu-2']['ansible_host'] }}"
-monitoring_host_port: 45180
+monitoring_host_port: 29880
 
 prometheus_host: "{{ monitoring_host }}"
 prometheus_host_port: "{{ monitoring_host_port }}"
@@ -57,8 +69,10 @@ prometheus_user: prometheus
 
 grafana_host: "{{ monitoring_host }}"
 grafana_host_port: "{{ monitoring_host_port }}"
+grafana_url: "http://{{ grafana_host }}:{{ grafana_host_port }}/grafana"
 grafana_service_port: 3000
 grafana_user: grafana
+grafana_email: "{{ grafana_user }}@localhost"
 grafana_password: !vault |
   $ANSIBLE_VAULT;1.1;AES256
   65396261343562323164363263643032613165396335636661333137643730323936386336663363

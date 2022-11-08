@@ -17,7 +17,7 @@
       ansible.builtin.shell: |
         influx -execute 'DROP DATABASE {{ influxdb_db }}'
         influxd restore -portable -database {{ influxdb_db }} {{ backup_user_home_restore_influxdb }}
-      ignore_errors: yes
+      ignore_errors: true
 
     - name: Stop Telegraf service
       ansible.builtin.service:

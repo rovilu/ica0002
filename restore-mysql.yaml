@@ -10,8 +10,8 @@
 
     - name: Grant executable permissions to backup script
       ansible.builtin.file:
-        path: "{{ backup_user_home_restore_mysql }}/{{ mysql_db }}.sql"
+        path: "{{ backup_user_home_restore_mysql }}/{{ mysql_agama_db }}.sql"
         mode: 0660
 
     - name: Restore MySQL database
-      ansible.builtin.shell: mysql {{ mysql_db }} < {{ backup_user_home_restore_mysql }}/{{ mysql_db }}.sql
+      ansible.builtin.shell: mysql {{ mysql_agama_db }} < {{ backup_user_home_restore_mysql }}/{{ mysql_agama_db }}.sql

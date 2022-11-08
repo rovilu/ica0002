@@ -2,7 +2,7 @@
   ansible.builtin.user:
     name: "{{ pinger_user }}"
     state: present
-    system: yes
+    system: true
 
 - name: Install required packages
   ansible.builtin.apt:
@@ -38,4 +38,4 @@
   ansible.builtin.service:
     name: pinger
     state: started
-    enabled: yes
+    enabled: true

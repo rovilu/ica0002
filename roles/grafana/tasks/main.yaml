@@ -19,7 +19,7 @@
   ansible.builtin.apt:
     name: grafana
     state: latest
-    update_cache: yes
+    update_cache: true
 
 - name: Configure Grafana service
   ansible.builtin.template:
@@ -31,8 +31,17 @@
 - name: Start and enable Grafana service
   ansible.builtin.service:
     name: grafana-server
-    state: started
-    enabled: yes
+    state: restarted
+    enabled: true
+
+- name: Create Grafana user
+  community.grafana.grafana_user:
+    grafana_url: "{{ grafana_url }}"
+    name: "{{ grafana_user }}"
+    login: "{{ grafana_user }}"
+    email: "{{ grafana_email }}"
+    password: "{{ grafana_password }}"
+    is_admin: true
 
 - name: Create datasources
   ansible.builtin.template:

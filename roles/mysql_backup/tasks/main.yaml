@@ -15,7 +15,7 @@
     name: "{{ backup_user }}"
     password: "{{ backup_password }}"
     host: "%"
-    priv: "{{ mysql_db }}.*:LOCK TABLES,SELECT"
+    priv: "{{ mysql_agama_db }}.*:LOCK TABLES,SELECT"
     login_unix_socket: "{{ mysql_socket }}"
   notify:
     - Restart MySQL service
@@ -38,6 +38,7 @@
     job: "{{ backup_mysql_job }}"
     cron_file: "{{ backup_mysql_cron_file }}"
   with_items: incremental
+  when: inventory_hostname == mysql_backup_host
 
 - name: Schedule MySQL full backup
   ansible.builtin.cron:
@@ -48,3 +49,4 @@
     job: "{{ backup_mysql_job }}"
     cron_file: "{{ backup_mysql_cron_file }}"
   with_items: full
+  when: inventory_hostname == mysql_backup_host

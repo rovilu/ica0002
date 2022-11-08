@@ -2,9 +2,9 @@
   ansible.builtin.user:
     name: "{{ backup_user }}"
     state: present
-    create_home: yes
+    create_home: true
     home: "{{ backup_user_home }}"
-    generate_ssh_key: yes
+    generate_ssh_key: true
     ssh_key_file: .ssh/id_rsa
 
 - name: Add backup server SSH key to known hosts list
