@@ -31,10 +31,14 @@
     - mysql_backup
     - mysql_exporter
 
+- name: Deploy Docker hosts
+  hosts: docker_hosts
+  roles:
+    - docker
+
 - name: Deploy web servers
   hosts: web_servers
   roles:
-    - uwsgi
     - agama
 
 - name: Deploy monitoring servers

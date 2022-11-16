@@ -1,73 +1,31 @@
-- name: Install required packages
-  ansible.builtin.apt:
-    name:
-      - apt-transport-https
-      - software-properties-common
-    state: latest
-
-- name: Add Grafana APT key
-  ansible.builtin.apt_key:
-    url: https://packages.grafana.com/gpg.key
-    state: present
-
-- name: Add Grafana APT repositories
-  ansible.builtin.apt_repository:
-    repo: deb https://packages.grafana.com/oss/deb stable main
-    state: present
-
-- name: Install Grafana package
-  ansible.builtin.apt:
-    name: grafana
-    state: latest
-    update_cache: true
-
-- name: Configure Grafana service
-  ansible.builtin.template:
-    src: grafana.ini
-    dest: /etc/grafana/grafana.ini
-  notify:
-    - Restart Grafana service
-
-- name: Start and enable Grafana service
-  ansible.builtin.service:
-    name: grafana-server
-    state: restarted
-    enabled: true
-
-- name: Create Grafana user
-  community.grafana.grafana_user:
-    grafana_url: "{{ grafana_url }}"
-    name: "{{ grafana_user }}"
-    login: "{{ grafana_user }}"
-    email: "{{ grafana_email }}"
-    password: "{{ grafana_password }}"
-    is_admin: true
-
-- name: Create datasources
-  ansible.builtin.template:
-    src: datasources.yml
-    dest: /etc/grafana/provisioning/datasources/datasources.yml
-  notify:
-    - Restart Grafana service
-
-- name: Provision Grafana dashboards
-  ansible.builtin.copy:
-    src: dashboards.yml
-    dest: /etc/grafana/provisioning/dashboards/dashboards.yml
-  notify:
-    - Restart Grafana service
-
-- name: Ensure Grafana dashboards directory exists
+- name: Create Grafana directories
   ansible.builtin.file:
-    path: /var/lib/grafana/dashboards
+    path: "{{ item }}"
     state: directory
+    recurse: true
+  loop: "{{ grafana_dirs }}"
 
-- name: Import Grafana dashboards
+- name: Copy Grafana resources
   ansible.builtin.copy:
-    src: "{{ item }}.json"
-    dest: /var/lib/grafana/dashboards/{{ item }}.json
-  with_items:
-    - main
-    - syslog
+    src: "{{ item.src }}"
+    dest: "{{ item.dest }}"
+  loop: "{{ grafana_resources }}"
   notify:
-    - Restart Grafana service
+    - Restart Grafana Docker container
+
+- name: Copy Grafana configs
+  ansible.builtin.template:
+    src: "{{ item.src }}"
+    dest: "{{ item.dest }}"
+  loop: "{{ grafana_configs }}"
+  notify:
+    - Restart Grafana Docker container
+
+- name: Run Grafana Docker container
+  community.docker.docker_container:
+    name: "{{ grafana_docker_container_name }}"
+    image: "{{ grafana_docker_container_image }}"
+    volumes: "{{ grafana_config_root_dir }}:{{ grafana_container_config_root_dir }}"
+    published_ports: "{{ grafana_service_port }}:{{ grafana_container_port }}"
+  notify:
+    - Restart Grafana Docker container

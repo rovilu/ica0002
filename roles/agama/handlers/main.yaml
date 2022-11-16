@@ -1,0 +1,4 @@
+- name: Restart AGAMA Docker container
+  community.docker.docker_container:
+    name: "{{ agama_docker_container_name }}"
+    restart: true

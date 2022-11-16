@@ -8,5 +8,5 @@ providers:
     updateIntervalSeconds: 10
     allowUiUpdates: false
     options:
-      path: /var/lib/grafana/dashboards
+      path: "{{ grafana_container_config_dashboards_dir }}"
       foldersFromFilesStructure: true

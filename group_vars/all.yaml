@@ -1,6 +1,14 @@
 nginx_port: 80
 nginx_sites_dir: /etc/nginx/sites-enabled
-uwsgi_port: 5000
+agama_host_port: 8001
+agama_container_port: 8000
+agama_dir: /opt/agama
+agama_urls:
+  - https://raw.githubusercontent.com/hudolejev/agama/master/agama.py
+  - https://raw.githubusercontent.com/hudolejev/agama/master/Dockerfile
+agama_docker_image_name: agama
+agama_docker_container_name: agama
+agama_container_config_root_dir: /opt/agama
 
 mysql_host: rovilu-2
 mysql_agama_db: agama
@@ -53,25 +61,28 @@ backup_password: !vault |
   63346133333565653634396166313866613466313065306238316665316130363536653430356430
   3530313262303864356139356539366533336532376631613231
 backup_mysql_cron_file: "{{ cron_dir }}/mysql-backup"
-backup_mysql_dump: rm -rf {{ backup_user_home_mysql }}/* && mysqldump {{ mysql_db }} > {{ backup_user_home_mysql }}/{{ mysql_db }}.sql
+backup_mysql_dump: rm -rf {{ backup_user_home_mysql }}/* && mysqldump {{ mysql_agama_db }} > {{ backup_user_home_mysql }}/{{ mysql_agama_db }}.sql
 backup_mysql_job: "{{ backup_mysql_dump }} && duplicity --no-encryption {{ item }} {{ backup_user_home_mysql }} rsync://{{ backup_host_user }}@{{ backup_host_fqdn }}/mysql"
 backup_influxdb_cron_file: "{{ cron_dir }}/influxdb-backup"
 backup_influxdb_dump: rm -rf {{ backup_user_home_influxdb }}/* && influxd backup -portable -database {{ influxdb_db }} {{ backup_user_home_influxdb }}
 backup_influxdb_job: "{{ backup_influxdb_dump }} && duplicity --no-encryption {{ item }} {{ backup_user_home_influxdb }} rsync://{{ backup_host_user }}@{{ backup_host_fqdn }}/influxdb"
 
 monitoring_host: "{{ hostvars['rovilu-2']['ansible_host'] }}"
-monitoring_host_port: 29880
+monitoring_host_port: 32880
 
 prometheus_host: "{{ monitoring_host }}"
 prometheus_host_port: "{{ monitoring_host_port }}"
 prometheus_service_port: 9090
 prometheus_user: prometheus
 
+monitoring_docker_host_address: 172.17.0.1
+
 grafana_host: "{{ monitoring_host }}"
 grafana_host_port: "{{ monitoring_host_port }}"
 grafana_url: "http://{{ grafana_host }}:{{ grafana_host_port }}/grafana"
-grafana_service_port: 3000
-grafana_user: grafana
+grafana_service_port: 3001
+grafana_container_port: 3000
+grafana_user: admin
 grafana_email: "{{ grafana_user }}@localhost"
 grafana_password: !vault |
   $ANSIBLE_VAULT;1.1;AES256
@@ -80,6 +91,27 @@ grafana_password: !vault |
   36323937333334303037313863613935336134316462326264353339363662393362616165613136
   6639326261633466350a343261383532636462393566616563643435633562353536656136636265
   61613032326235653233323235303063623866623638343934653262636665353031
+grafana_docker_container_name: grafana
+grafana_docker_container_image: grafana/grafana
+grafana_container_config_root_dir: /etc/grafana
+grafana_container_config_provisioning_dir: "{{ grafana_container_config_root_dir }}/provisioning"
+grafana_container_config_dashboards_dir: "{{ grafana_container_config_provisioning_dir }}/dashboards"
+grafana_container_config_datasources_dir: "{{ grafana_container_config_provisioning_dir }}/datasources"
+grafana_config_root_dir: /opt/grafana
+grafana_config_provisioning_dir: "{{ grafana_config_root_dir }}/provisioning"
+grafana_config_dashboards_dir: "{{ grafana_config_provisioning_dir }}/dashboards"
+grafana_config_datasources_dir: "{{ grafana_config_provisioning_dir }}/datasources"
+grafana_dirs:
+  - "{{ grafana_config_dashboards_dir }}"
+  - "{{ grafana_config_datasources_dir }}"
+grafana_resources:
+  - { src: main.json, dest: "{{ grafana_config_dashboards_dir }}/" }
+  - { src: mysql.json, dest: "{{ grafana_config_dashboards_dir }}/" }
+  - { src: syslog.json, dest: "{{ grafana_config_dashboards_dir }}/" }
+grafana_configs:
+  - { src: dashboards.yml, dest: "{{ grafana_config_dashboards_dir }}/" }
+  - { src: datasources.yml, dest: "{{ grafana_config_datasources_dir }}/" }
+  - { src: grafana.ini, dest: "{{ grafana_config_root_dir }}/" }
 
 node_exporter_port: 9100
 nginx_exporter_port: 9113
