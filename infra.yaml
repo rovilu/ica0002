@@ -35,6 +35,14 @@
   hosts: docker_hosts
   roles:
     - docker
+    - keepalived
+    - keepalived_exporter
+
+- name: Deploy HAProxy hosts
+  hosts: haproxy_servers
+  roles:
+    - haproxy
+    - haproxy_exporter
 
 - name: Deploy web servers
   hosts: web_servers

@@ -12,13 +12,13 @@
 - name: Install Pinger
   ansible.builtin.copy:
     src: pinger.sh
-    dest: /usr/local/bin/pinger
+    dest: "{{ bin_dir }}/"
     mode: 0755
 
 - name: Configure Pinger service
   ansible.builtin.template:
     src: pinger.service
-    dest: /etc/systemd/system/pinger.service
+    dest: "{{ systemd_dir }}/"
   notify:
     - Reload systemd daemon
 

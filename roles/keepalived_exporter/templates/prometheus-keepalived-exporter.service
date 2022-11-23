@@ -1,0 +1,11 @@
+[Unit]
+Description=
+Documentation=
+After=network-online.target
+
+[Service]
+User={{ keepalived_exporter_user }}
+ExecStart={{ bin_dir }}/{{ keepalived_exporter_binary_name }}
+
+[Install]
+WantedBy=multi-user.target

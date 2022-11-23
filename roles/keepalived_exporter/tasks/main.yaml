@@ -1,0 +1,30 @@
+- name: Download Prometheus Keepalived Exporter binary
+  ansible.builtin.get_url:
+    url: "{{ keepalived_exporter_binary_url }}"
+    dest: "{{ keepalived_exporter_binary_archive_path }}"
+
+- name: Extract Prometheus Keepalived Exporter binary
+  ansible.builtin.unarchive:
+    src: "{{ keepalived_exporter_binary_archive_path }}"
+    dest: /opt/
+    remote_src: true
+
+- name: Copy Prometheus Keepalived Exporter binary to binary directory
+  ansible.builtin.copy:
+    src: "{{ keepalived_exporter_binary_dir_path }}/keepalived-exporter"
+    dest: "{{ bin_dir }}/{{ keepalived_exporter_binary_name }}"
+    mode: 0755
+    remote_src: true
+
+- name: Copy Prometheus Keepalived Exporter service
+  ansible.builtin.template:
+    src: "{{ keepalived_exporter_service_name }}.service"
+    dest: "{{ systemd_dir }}/"
+  notify:
+    - Reload systemd daemon
+
+- name: Enable and start Prometheus Keepalived Exporter service
+  ansible.builtin.service:
+    name: "{{ keepalived_exporter_service_name }}"
+    state: started
+    enabled: true

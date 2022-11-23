@@ -10,7 +10,7 @@ agama_docker_image_name: agama
 agama_docker_container_name: agama
 agama_container_config_root_dir: /opt/agama
 
-mysql_host: rovilu-2
+mysql_host: "{{ hostvars['rovilu-2']['ansible_default_ipv4']['address'] }}"
 mysql_agama_db: agama
 mysql_agama_user: agama
 mysql_agama_password: !vault |
@@ -68,7 +68,7 @@ backup_influxdb_dump: rm -rf {{ backup_user_home_influxdb }}/* && influxd backup
 backup_influxdb_job: "{{ backup_influxdb_dump }} && duplicity --no-encryption {{ item }} {{ backup_user_home_influxdb }} rsync://{{ backup_host_user }}@{{ backup_host_fqdn }}/influxdb"
 
 monitoring_host: "{{ hostvars['rovilu-2']['ansible_host'] }}"
-monitoring_host_port: 32880
+monitoring_host_port: 33780
 
 prometheus_host: "{{ monitoring_host }}"
 prometheus_host_port: "{{ monitoring_host_port }}"
@@ -91,6 +91,7 @@ grafana_password: !vault |
   36323937333334303037313863613935336134316462326264353339363662393362616165613136
   6639326261633466350a343261383532636462393566616563643435633562353536656136636265
   61613032326235653233323235303063623866623638343934653262636665353031
+
 grafana_docker_container_name: grafana
 grafana_docker_container_image: grafana/grafana
 grafana_container_config_root_dir: /etc/grafana
@@ -101,6 +102,7 @@ grafana_config_root_dir: /opt/grafana
 grafana_config_provisioning_dir: "{{ grafana_config_root_dir }}/provisioning"
 grafana_config_dashboards_dir: "{{ grafana_config_provisioning_dir }}/dashboards"
 grafana_config_datasources_dir: "{{ grafana_config_provisioning_dir }}/datasources"
+
 grafana_dirs:
   - "{{ grafana_config_dashboards_dir }}"
   - "{{ grafana_config_datasources_dir }}"
@@ -128,3 +130,26 @@ pinger_user: pinger
 influxdb_db: telegraf
 influxdb_port: 8086
 syslog_port: 6514
+
+keepalived_conf_name: keepalived.conf
+keepalived_user: keepalived_script
+keepalived_healthcheck_script_name: healthcheck.sh
+keepalived_config_root_dir: /etc/keepalived
+keepalived_script_user_home_dir: /home/keepalived_script
+keepalived_exporter_binary_dir_name: keepalived-exporter-1.2.0.linux-amd64
+keepalived_exporter_binary_archive_name: "{{ keepalived_exporter_binary_dir_name }}.tar.gz"
+keepalived_exporter_binary_archive_path: /opt/{{ keepalived_exporter_binary_archive_name }}
+keepalived_exporter_binary_dir_path: /opt/{{ keepalived_exporter_binary_dir_name }}
+keepalived_exporter_binary_url: http://backup/{{ keepalived_exporter_binary_archive_name }}
+keepalived_exporter_binary_name: prometheus-keepalived-exporter
+keepalived_exporter_service_name: prometheus-keepalived-exporter
+keepalived_exporter_user: root
+keepalived_exporter_port: 9165
+
+haproxy_stats_port: 9188
+haproxy_conf_name: haproxy.cfg
+haproxy_config_root_dir: /etc/haproxy
+haproxy_exporter_port: 9101
+
+bin_dir: /usr/local/bin
+systemd_dir: /etc/systemd/system
