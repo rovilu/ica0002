@@ -1,6 +1,6 @@
 ;
 $TTL 2d                 ; default TTL for zone
-$ORIGIN {{ bind_domain }}.   ; base domain name
+$ORIGIN {{ bind_ptr_domain }}.   ; base domain name
 ;
 @       IN      SOA     rovilu-2.{{ bind_domain }}. hostmaster.{{ bind_domain }}. (
 			            2		; serial number

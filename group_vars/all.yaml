@@ -1,5 +1,6 @@
 nginx_port: 80
 nginx_sites_dir: /etc/nginx/sites-enabled
+
 agama_host_port: 8001
 agama_container_port: 8000
 agama_dir: /opt/agama
@@ -10,7 +11,7 @@ agama_docker_image_name: agama
 agama_docker_container_name: agama
 agama_container_config_root_dir: /opt/agama
 
-mysql_host: "{{ hostvars['rovilu-2']['ansible_default_ipv4']['address'] }}"
+mysql_host: rovilu-2
 mysql_agama_db: agama
 mysql_agama_user: agama
 mysql_agama_password: !vault |
@@ -33,15 +34,49 @@ mysql_replication_password: !vault |
 mysql_backup_host: "{{ groups['db_servers'] | reject('eq', mysql_host) | first | default(mysql_host) }}"
 node_id: "{{ (ansible_port / 100) | int }}"
 
+bind_db_file: /var/cache/bind/db.{{ bind_domain }}
+bind_db_ptr_file: /var/cache/bind/db.{{ bind_ptr_domain }}
+bind_transfer_key_name: transfer.key
+bind_nsupdate_key_name: nsupdate.key
+bind_master_host: rovilu-2
 bind_domain: vilur.io
+bind_ptr_domain: 168.192.in-addr.arpa
 bind_allow_query: 192.168.42.0/23; 127.0.0.0/8;
 bind_forwarders: 1.1.1.1; 8.8.8.8; 9.9.9.9; 9.9.9.10;
+bind_records:
+  - { name: backup, host: "{{ backup_host_ip }}", type: "A" }
+  - { name: grafana, host: rovilu-2, type: "CNAME" }
+  - { name: influxdb, host: rovilu-2, type: "CNAME" }
+  - { name: lb1, host: rovilu-1, type: "CNAME" }
+  - { name: lb2, host: rovilu-2, type: "CNAME" }
+  - { name: mysql1, host: rovilu-1, type: "CNAME" }
+  - { name: mysql2, host: rovilu-2, type: "CNAME" }
+  - { name: ns1, host: rovilu-1, type: "CNAME" }
+  - { name: ns2, host: rovilu-2, type: "CNAME" }
+  - { name: prometheus, host: rovilu-2, type: "CNAME" }
+  - { name: web1, host: rovilu-1, type: "CNAME" }
+  - { name: web2, host: rovilu-2, type: "CNAME" }
+bind_transfer_key_secret: !vault |
+  $ANSIBLE_VAULT;1.1;AES256
+  64343935626138346334646263313136663338613238666532323133633735383034643462643232
+  3664643936313838656138353461363931306432623030330a623663656637356138636235323839
+  64353136623565326662346539636630366161376131656165343233316566346631643335346238
+  3337623935663566640a363565373032313131343935636532396666643633383032323535363034
+  33316664383937396464386665363663646664633164613533363037383738383339333835623939
+  3562333338356561353461353463333464316666646139306334
+bind_nsupdate_key_secret: !vault |
+  $ANSIBLE_VAULT;1.1;AES256
+  35353864393930646562653437333638653838386234613032373964353964383735623036633134
+  3233373937353162313533653638333866333034636535650a633638323064396266366565303665
+  66663838396135643464366438623438326432636366343262366434313037333930396363306566
+  6361616262623865360a663532306363323536653766313331623963396236356534346439373837
+  31343838353839393037363331623562366161356363366432643230306461393664353831346666
+  3639616365316563316566343637633363333934386164333332
 
 cron_dir: /etc/cron.d
 
 backup_host_ip: 192.168.42.132
 backup_host: backup
-
 backup_host_fqdn: "{{ backup_host }}.{{ bind_domain }}"
 backup_host_ssh_key: ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIEu6pFFWyuRrl4WGFPQGElYN9txwTGm2wSntcpVAaN90
 backup_host_user: rovilu
@@ -68,9 +103,11 @@ backup_influxdb_dump: rm -rf {{ backup_user_home_influxdb }}/* && influxd backup
 backup_influxdb_job: "{{ backup_influxdb_dump }} && duplicity --no-encryption {{ item }} {{ backup_user_home_influxdb }} rsync://{{ backup_host_user }}@{{ backup_host_fqdn }}/influxdb"
 
 monitoring_host: "{{ hostvars['rovilu-2']['ansible_host'] }}"
-monitoring_host_port: 33780
+monitoring_host_port: 5480
+monitoring_host_int: "{{ hostvars['rovilu-2']['ansible_default_ipv4']['address'] }}"
 
 prometheus_host: "{{ monitoring_host }}"
+prometheus_host_int: "{{ monitoring_host_int }}"
 prometheus_host_port: "{{ monitoring_host_port }}"
 prometheus_service_port: 9090
 prometheus_user: prometheus
@@ -78,6 +115,7 @@ prometheus_user: prometheus
 monitoring_docker_host_address: 172.17.0.1
 
 grafana_host: "{{ monitoring_host }}"
+grafana_host_int: "{{ monitoring_host_int }}"
 grafana_host_port: "{{ monitoring_host_port }}"
 grafana_url: "http://{{ grafana_host }}:{{ grafana_host_port }}/grafana"
 grafana_service_port: 3001
@@ -127,6 +165,7 @@ mysql_exporter_password: !vault |
   3633616463363033660a303962653237383734323962383763343639633834623061353334626630
   63663765363765386339343635623537333864626165613563303864666366363938
 pinger_user: pinger
+influxdb_host_int: "{{ monitoring_host_int }}"
 influxdb_db: telegraf
 influxdb_port: 8086
 syslog_port: 6514

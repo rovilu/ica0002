@@ -1,6 +1,9 @@
 - name: Install BIND 9 package
   ansible.builtin.apt:
-    name: bind9
+    name:
+      - bind9
+      - python3-dns
+      - python3-dnspython
     state: latest
 
 - name: Start and enable BIND 9 service
@@ -16,9 +19,49 @@
   notify:
     - Restart BIND 9 service
 
-- name: Configure BIND 9 master zone
+- name: Initialize BIND 9 zones
   ansible.builtin.template:
-    src: db.{{ bind_domain }}
-    dest: /var/lib/bind/db.{{ bind_domain }}
+    src: db.{{ item.domain }}
+    dest: "{{ item.file }}"
+    force: false
+  with_items:
+    - { domain: "{{ bind_domain }}", file: "{{ bind_db_file }}" }
+    - { domain: "{{ bind_ptr_domain }}", file: "{{ bind_db_ptr_file }}" }
   notify:
     - Reload BIND 9 configuration
+
+- name: Add BIND 9 keys
+  ansible.builtin.template:
+    src: named.conf.options
+    dest: /etc/bind/
+  notify:
+    - Reload BIND 9 configuration
+
+- name: Reload BIND 9 configuration
+  meta: flush_handlers
+
+- name: Add BIND 9 {{ bind_domain }} zone records
+  community.general.nsupdate:
+    key_name: "{{ bind_nsupdate_key_name }}"
+    key_algorithm: hmac-sha256
+    key_secret: "{{ bind_nsupdate_key_secret }}"
+    server: "{{ groups['dns_masters'][0] }}"
+    zone: "{{ bind_domain }}"
+    record: "{{ item.name }}"
+    value: "{{ item.host }}"
+    type: "{{ item.type }}"
+  with_items: "{{ bind_records }}"
+  when: inventory_hostname == groups['dns_masters'][0]
+
+- name: Add BIND 9 {{ bind_ptr_domain }} zone records
+  community.general.nsupdate:
+    key_name: "{{ bind_nsupdate_key_name }}"
+    key_algorithm: hmac-sha256
+    key_secret: "{{ bind_nsupdate_key_secret }}"
+    server: "{{ groups['dns_masters'][0] }}"
+    zone: "{{ bind_ptr_domain }}"
+    record: "{{ hostvars[item.host]['ansible_default_ipv4']['address'].split('.')[-2:] if item.name != 'backup' else item.host.split('.')[-2:] | join('.') }}"
+    value: "{{ item.name }}.{{ bind_domain }}."
+    type: PTR
+  with_items: "{{ bind_records }}"
+  when: inventory_hostname == groups['dns_masters'][0]

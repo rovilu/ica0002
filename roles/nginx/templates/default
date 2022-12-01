@@ -16,13 +16,13 @@ server {
 
 {% if inventory_hostname in groups['monitoring_servers'] %}
     location /prometheus {
-        proxy_pass http://localhost:{{ prometheus_service_port }};
+        proxy_pass http://prometheus:{{ prometheus_service_port }};
     }
 
     location /grafana {
         rewrite  ^/grafana/(.*)  /$1 break;
         proxy_set_header Host $http_host;
-        proxy_pass http://localhost:{{ grafana_service_port }};
+        proxy_pass http://grafana:{{ grafana_service_port }};
     }
 {% endif %}
 }

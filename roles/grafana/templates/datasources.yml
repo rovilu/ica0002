@@ -4,7 +4,7 @@ datasources:
     type: prometheus
     access: proxy
     orgId: 1
-    url: http://{{ monitoring_docker_host_address }}/prometheus
+    url: http://prometheus/prometheus
     isDefault: true
 
   - name: InfluxDB

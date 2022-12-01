@@ -30,3 +30,4 @@
       AGAMA_DATABASE_URI: mysql+pymysql://{{ mysql_agama_user }}:{{ mysql_agama_password }}@{{ mysql_host }}/{{ mysql_agama_db }}
   notify:
     - Restart AGAMA Docker container
+    - Restart MySQL service
