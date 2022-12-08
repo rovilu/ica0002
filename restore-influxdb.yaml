@@ -1,9 +1,14 @@
 - name: Restore InfluxDB database
   hosts: monitoring_servers
   tasks:
-    - name: Download InfluxDB backup
+
+    - name: Clear InfluxDB backup restore directory
+      ansible.builtin.file:
+        path: "{{ influxdb_backup_restore_dir }}"
+        state: absent
+
+    - name: Download InfluxDB database backup
       ansible.builtin.shell: |
-        rm -rf {{ influxdb_backup_dir }}/*
         sudo -u {{ backup_user_username }} duplicity --no-encryption restore \
           rsync://{{ backup_host_user_username }}@{{ backup_host_fqdn }}/{{ influxdb_backup_host_dir }} \
           {{ influxdb_backup_restore_dir }}

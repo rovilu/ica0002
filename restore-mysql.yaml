@@ -1,12 +1,16 @@
 - name: Restore MySQL database
   hosts: db_servers
   tasks:
+
+    - name: Clear MySQL backup restore directory
+      ansible.builtin.file:
+        path: "{{ mysql_backup_restore_dir }}"
+        state: absent
+
     - name: Download MySQL database backup
       ansible.builtin.shell: |
-        rm -rf {{ mysql_backup_dir }}/*
         sudo -u {{ backup_user_username }} duplicity --no-encryption restore \
-          rsync://{{ backup_host_user_username }}@{{ backup_host_fqdn }}/{{ mysql_backup_host_dir }} \
-          {{ mysql_backup_restore_dir }}
+          rsync://{{ backup_host_user_username }}@{{ backup_host_fqdn }}/{{ mysql_backup_host_dir }} {{ mysql_backup_restore_dir }}
 
     - name: Grant executable permissions to backup script
       ansible.builtin.file:
@@ -14,4 +18,8 @@
         mode: 0660
 
     - name: Restore MySQL database
-      ansible.builtin.shell: mysql {{ mysql_agama_db_name }} < {{ mysql_backup_restore_dir }}/{{ mysql_agama_db_name }}.sql
+      community.mysql.mysql_db:
+        name: "{{ mysql_agama_db_name }}"
+        state: import
+        target: "{{ mysql_backup_restore_dir }}/{{ mysql_agama_db_name }}.sql"
+        login_unix_socket: "{{ mysql_socket }}"

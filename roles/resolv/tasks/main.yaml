@@ -5,6 +5,6 @@
 
 - name: Stop and disable hosts systemd-resolved service
   ansible.builtin.service:
-    name: "{{ resolv_conf_systemd_resolved_service_name }}"
+    name: "{{ resolv_systemd_resolved_service_name }}"
     state: stopped
     enabled: no

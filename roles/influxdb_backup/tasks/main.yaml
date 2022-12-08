@@ -7,7 +7,7 @@
 
 - name: Schedule InfluxDB backup
   ansible.builtin.cron:
-    name: InfluxDB database {{ item.name }} backup
+    name: "{{ item.name }}"
     weekday: "{{ item.weekday }}"
     hour: 0
     user: "{{ backup_user_username }}"
