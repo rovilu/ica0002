@@ -1,61 +1,61 @@
 - name: Initialize hosts
   hosts: all
   roles:
-    - setup
-    - init
-    - backup
+    - { role: setup, tags: setup }
+    - { role: init, tags: init }
+    - { role: backup, tags: backup }
 
 - name: Deploy DNS servers
   hosts: dns_servers
   roles:
-    - bind
-    - bind_exporter
+    - { role: bind, tags: bind }
+    - { role: bind_exporter, tags: bind_exporter }
 
 - name: Configure hosts
   hosts: all
   roles:
-    - resolv
-    - node_exporter
-    - rsyslog
+    - { role: resolv, tags: resolv }
+    - { role: node_exporter, tags: node_exporter }
+    - { role: rsyslog, tags: rsyslog }
 
 - name: Deploy Nginx servers
   hosts: nginx_servers
   roles:
-    - nginx
-    - nginx_exporter
+    - { role: nginx, tags: nginx }
+    - { role: nginx_exporter, tags: nginx_exporter }
 
 - name: Deploy database servers
   hosts: db_servers
   roles:
-    - mysql
-    - mysql_backup
-    - mysql_exporter
+    - { role: mysql, tags: mysql }
+    - { role: mysql_backup, tags: mysql_backup }
+    - { role: mysql_exporter, tags: mysql_exporter }
 
 - name: Deploy Docker hosts
   hosts: docker_hosts
   roles:
-    - docker
+    - { role: docker, tags: docker }
 
 - name: Deploy HAProxy hosts
   hosts: haproxy_servers
   roles:
-    - keepalived
-    - keepalived_exporter
-    - haproxy
-    - haproxy_exporter
+    - { role: keepalived, tags: keepalived }
+    - { role: keepalived_exporter, tags: keepalived_exporter }
+    - { role: haproxy, tags: haproxy }
+    - { role: haproxy_exporter, tags: haproxy_exporter }
 
 - name: Deploy web servers
   hosts: web_servers
   roles:
-    - agama
+    - { role: agama, tags: agama }
 
 - name: Deploy monitoring servers
   hosts: monitoring_servers
   roles:
-    - prometheus
-    - grafana
-    - influxdb
-    - telegraf
-    - influxdb_backup
-    - pinger
-    - influxdb_exporter
+    - { role: prometheus, tags: prometheus }
+    - { role: grafana, tags: grafana }
+    - { role: influxdb, tags: influxdb }
+    - { role: telegraf, tags: telegraf }
+    - { role: influxdb_backup, tags: influxdb_backup }
+    - { role: pinger, tags: pinger }
+    - { role: influxdb_exporter, tags: influxdb_exporter }
