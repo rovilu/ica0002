@@ -35,12 +35,12 @@
   hosts: docker_hosts
   roles:
     - docker
-    - keepalived
-    - keepalived_exporter
 
 - name: Deploy HAProxy hosts
   hosts: haproxy_servers
   roles:
+    - keepalived
+    - keepalived_exporter
     - haproxy
     - haproxy_exporter
 
@@ -55,6 +55,7 @@
     - prometheus
     - grafana
     - influxdb
+    - telegraf
     - influxdb_backup
     - pinger
     - influxdb_exporter

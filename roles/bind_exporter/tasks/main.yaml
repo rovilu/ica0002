@@ -1,17 +1,17 @@
-- name: Install Prometheus BIND Exporter package
+- name: Install Prometheus BIND Exporter packages
   ansible.builtin.apt:
-    name: prometheus-bind-exporter
+    name: "{{ bind_exporter_packages }}"
     state: latest
 
-- name: Expose Prometheus BIND Exporter service
+- name: Configure Prometheus BIND Exporter service
   ansible.builtin.template:
-    src: prometheus-bind-exporter
-    dest: /etc/default/prometheus-bind-exporter
+    src: "{{ bind_exporter_conf }}"
+    dest: "{{ bind_exporter_conf_dir }}"
   notify:
     - Restart Prometheus BIND Exporter service
 
 - name: Start and enable Prometheus BIND Exporter service
   ansible.builtin.service:
-    name: prometheus-bind-exporter
+    name: "{{ bind_exporter_service_name }}"
     state: started
     enabled: true

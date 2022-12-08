@@ -1,31 +1,18 @@
-- name: Create InfluxDB backup directory
+- name: Create InfluxDB backup directories
   ansible.builtin.file:
-    path: "{{ backup_user_home_influxdb }}"
+    path: "{{ item }}"
     state: directory
-    owner: "{{ backup_user }}"
+    owner: "{{ backup_user_username }}"
+  with_items: "{{ influxdb_backup_dirs }}"
 
-- name: Create InfluxDB restore directory
-  ansible.builtin.file:
-    path: "{{ backup_user_home_restore_influxdb }}"
-    state: directory
-    owner: "{{ backup_user }}"
-
-- name: Schedule InfluxDB incremental backup
+- name: Schedule InfluxDB backup
   ansible.builtin.cron:
-    name: InfluxDB database incremental backup
-    weekday: "1-6"
-    hour: "0"
-    user: "{{ backup_user }}"
-    job: "{{ backup_influxdb_job }}"
-    cron_file: "{{ backup_influxdb_cron_file }}"
-  with_items: incremental
-
-- name: Schedule InfluxDB full backup
-  ansible.builtin.cron:
-    name: InfluxDB database full backup
-    weekday: "0"
-    hour: "0"
-    user: "{{ backup_user }}"
-    job: "{{ backup_influxdb_job }}"
-    cron_file: "{{ backup_influxdb_cron_file }}"
-  with_items: full
+    name: InfluxDB database {{ item.name }} backup
+    weekday: "{{ item.weekday }}"
+    hour: 0
+    user: "{{ backup_user_username }}"
+    cron_file: "{{ influxdb_backup_cron_file }}"
+    job: rm -rf {{ influxdb_backup_dir }}/* && influxd backup -portable -database {{ telegraf_influxdb_db_name }} {{ influxdb_backup_dir }} && duplicity --no-encryption full {{ influxdb_backup_dir }} rsync://{{ backup_host_user_username }}@{{ backup_host_fqdn }}/{{ influxdb_backup_host_dir }}"
+  with_items:
+    - { name: InfluxDB full backup, type: full, weekday: 0 }
+    - { name: InfluxDB incremental backup, type: incremental, weekday: 1-6 }

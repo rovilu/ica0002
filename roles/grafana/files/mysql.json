@@ -24,7 +24,7 @@
   "editable": true,
   "fiscalYearStartMonth": 0,
   "graphTooltip": 0,
-  "id": 3,
+  "id": 2,
   "links": [],
   "liveNow": false,
   "panels": [
@@ -590,13 +590,13 @@
     "list": []
   },
   "time": {
-    "from": "2022-11-08T10:10:18.191Z",
-    "to": "2022-11-08T16:49:54.191Z"
+    "from": "now-5m",
+    "to": "now"
   },
   "timepicker": {},
   "timezone": "",
   "title": "MySQL",
   "uid": "5jA4L2DVz",
-  "version": 3,
+  "version": 1,
   "weekStart": ""
 }

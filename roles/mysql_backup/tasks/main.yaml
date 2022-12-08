@@ -1,52 +1,38 @@
-- name: Create MySQL backup directory
+- name: Create MySQL backup directories
   ansible.builtin.file:
-    path: "{{ backup_user_home_mysql }}"
+    path: "{{ mysql_backup_dir }}"
     state: directory
-    owner: "{{ backup_user }}"
-
-- name: Create MySQL restore directory
-  ansible.builtin.file:
-    path: "{{ backup_user_home_restore_mysql }}"
-    state: directory
-    owner: "{{ backup_user }}"
+    owner: "{{ backup_user_username }}"
+  with_items: "{{ mysql_backup_dirs }}"
 
 - name: Create MySQL user for backup
   community.mysql.mysql_user:
-    name: "{{ backup_user }}"
-    password: "{{ backup_password }}"
+    name: "{{ backup_user_username }}"
+    password: "{{ backup_user_password }}"
     host: "%"
-    priv: "{{ mysql_agama_db }}.*:LOCK TABLES,SELECT"
+    priv: "{{ mysql_agama_db_name }}.*:LOCK TABLES,SELECT"
     login_unix_socket: "{{ mysql_socket }}"
   notify:
     - Restart MySQL service
 
 - name: Configure MySQL client for backup
   ansible.builtin.template:
-    src: .my.cnf
-    dest: "{{ backup_user_home }}/.my.cnf"
+    src: "{{ mysql_backup_client_conf }}"
+    dest: "{{ backup_user_home }}/"
     mode: 0600
-    owner: "{{ backup_user }}"
+    owner: "{{ backup_user_username }}"
   notify:
     - Restart MySQL service
 
-- name: Schedule MySQL incremental backup
+- name: Schedule MySQL backup
   ansible.builtin.cron:
-    name: MySQL database incremental backup
-    weekday: "1-6"
+    name: "{{ item.name }}"
+    weekday: "{{ item.weekday }}"
     hour: "0"
-    user: "{{ backup_user }}"
-    job: "{{ backup_mysql_job }}"
-    cron_file: "{{ backup_mysql_cron_file }}"
-  with_items: incremental
-  when: inventory_hostname == mysql_backup_host
-
-- name: Schedule MySQL full backup
-  ansible.builtin.cron:
-    name: MySQL database full backup
-    weekday: "0"
-    hour: "0"
-    user: "{{ backup_user }}"
-    job: "{{ backup_mysql_job }}"
-    cron_file: "{{ backup_mysql_cron_file }}"
-  with_items: full
+    user: "{{ backup_user_username }}"
+    cron_file: "{{ mysql_backup_cron_file }}"
+    job: rm -rf {{ mysql_backup_dir }}/* && mysqldump {{ mysql_agama_db_name }} > {{ mysql_backup_dir }}/{{ mysql_agama_db_name }}.sql && duplicity --no-encryption {{ item.type }} {{ mysql_backup_dir }} rsync://{{ backup_host_user_username }}@{{ backup_host_fqdn }}/{{ mysql_backup_host_dir }}"
+  with_items:
+    - { name: MySQL full backup, type: full, weekday: 0 }
+    - { name: MySQL incremental backup, type: incremental, weekday: 1-6 }
   when: inventory_hostname == mysql_backup_host

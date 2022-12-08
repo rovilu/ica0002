@@ -1,8 +1,8 @@
 - name: Update APT cache
   ansible.builtin.apt:
-    cache_valid_time: 7200
+    cache_valid_time: "{{ init_cache_valid_time }}"
 
-- name: Install CA certificates package
+- name: Install init packages
   ansible.builtin.apt:
-    name: ca-certificates
+    name: "{{ init_packages }}"
     state: latest

@@ -4,8 +4,8 @@ Documentation=
 After=network-online.target
 
 [Service]
-User={{ pinger_user }}
-ExecStart=/usr/local/bin/pinger
+User={{ pinger_user_username }}
+ExecStart={{ pinger_shell_dir }}/{{ pinger_shell }}
 
 [Install]
 WantedBy=multi-user.target

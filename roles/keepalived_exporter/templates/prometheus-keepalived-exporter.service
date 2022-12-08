@@ -4,8 +4,8 @@ Documentation=
 After=network-online.target
 
 [Service]
-User={{ keepalived_exporter_user }}
-ExecStart={{ bin_dir }}/{{ keepalived_exporter_binary_name }}
+User={{ keepalived_exporter_user_username }}
+ExecStart={{ keepalived_exporter_bin_path }}/{{ keepalived_exporter_bin }}
 
 [Install]
 WantedBy=multi-user.target

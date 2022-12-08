@@ -1,5 +1,6 @@
-rovilu-1 ansible_host=193.40.156.67 ansible_port=11722
-rovilu-2 ansible_host=193.40.156.67 ansible_port=5422
+rovilu-1 ansible_host=193.40.156.67 ansible_port=5022
+rovilu-2 ansible_host=193.40.156.67 ansible_port=17722
+rovilu-3 ansible_host=193.40.156.67 ansible_port=6022
 
 [web_servers]
 rovilu-1
@@ -12,23 +13,25 @@ rovilu-2
 [docker_hosts]
 rovilu-1
 rovilu-2
+rovilu-3
 
 [dns_servers:children]
 dns_masters
 dns_slaves
 
 [dns_masters]
-rovilu-2
+rovilu-3
 
 [dns_slaves]
 rovilu-1
+rovilu-2
 
 [haproxy_servers]
 rovilu-1
 rovilu-2
 
 [monitoring_servers]
-rovilu-2
+rovilu-3
 
 [nginx_servers:children]
 web_servers

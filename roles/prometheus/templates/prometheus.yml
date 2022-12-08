@@ -15,28 +15,28 @@ scrape_configs:
     scrape_interval: 5s
     scrape_timeout: 5s
     static_configs:
-      - targets: ['localhost:9100']
+      - targets: ['localhost:{{ node_exporter_host_port }}']
 
   - job_name: linux
     static_configs:
-      - targets: {{ groups['all'] | product([node_exporter_port]) | map('join', ':') | list }}
+      - targets: {{ groups['all'] | product([node_exporter_host_port]) | map('join', ':') | list }}
 
   - job_name: nginx
     static_configs:
-      - targets: {{ groups['nginx_servers'] | product([nginx_exporter_port]) | map('join', ':') | list }}
+      - targets: {{ groups['nginx_servers'] | product([nginx_exporter_host_port]) | map('join', ':') | list }}
 
   - job_name: mysql
     static_configs:
-      - targets: {{ groups['db_servers'] | product([mysql_exporter_port]) | map('join', ':') | list }}
+      - targets: {{ groups['db_servers'] | product([mysql_exporter_host_port]) | map('join', ':') | list }}
 
   - job_name: bind
     static_configs:
-      - targets: {{ groups['dns_servers'] | product([bind_exporter_port]) | map('join', ':') | list }}
+      - targets: {{ groups['dns_servers'] | product([bind_exporter_host_port]) | map('join', ':') | list }}
 
   - job_name: haproxy
     static_configs:
-    - targets: {{ groups['haproxy_servers'] | product([haproxy_exporter_port]) | map('join', ':') | list }}
+    - targets: {{ groups['haproxy_servers'] | product([haproxy_exporter_host_port]) | map('join', ':') | list }}
                     
   - job_name: keepalived
     static_configs:
-    - targets: {{ groups['docker_hosts'] | product([keepalived_exporter_port]) | map('join', ':') | list }}
+    - targets: {{ groups['haproxy_servers'] | product([keepalived_exporter_host_port]) | map('join', ':') | list }}

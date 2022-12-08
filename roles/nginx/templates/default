@@ -1,5 +1,5 @@
 server {
-	listen 80 default_server;
+	listen {{ nginx_host_port }} default_server;
 	server_name _;
 
 {% if inventory_hostname in groups['web_servers'] %}
@@ -8,21 +8,19 @@ server {
     }
 {% endif %}
 
-{% if inventory_hostname in groups['nginx_servers'] %}
     location /stub_status {
         stub_status on;
     }
-{% endif %}
 
 {% if inventory_hostname in groups['monitoring_servers'] %}
     location /prometheus {
-        proxy_pass http://prometheus:{{ prometheus_service_port }};
+        proxy_pass http://prometheus:{{ prometheus_host_port }};
     }
 
     location /grafana {
         rewrite  ^/grafana/(.*)  /$1 break;
         proxy_set_header Host $http_host;
-        proxy_pass http://grafana:{{ grafana_service_port }};
+        proxy_pass http://grafana:{{ grafana_host_port }};
     }
 {% endif %}
 }

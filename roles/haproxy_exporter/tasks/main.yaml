@@ -1,17 +1,17 @@
-- name: Install Prometheus HAProxy Exporter package
+- name: Install Prometheus HAProxy Exporter packages
   ansible.builtin.apt:
-    name: prometheus-haproxy-exporter
+    name: "{{ haproxy_exporter_packages }}"
     state: latest
 
-- name: Expose Prometheus HAProxy Exporter service
+- name: Configure Prometheus HAProxy Exporter service
   ansible.builtin.template:
-    src: prometheus-haproxy-exporter
-    dest: /etc/default/prometheus-haproxy-exporter
+    src: "{{ haproxy_exporter_conf }}"
+    dest: "{{ haproxy_exporter_conf_dir }}"
   notify:
     - Restart Prometheus HAProxy Exporter service
 
 - name: Start and enable Prometheus HAProxy Exporter service
   ansible.builtin.service:
-    name: prometheus-haproxy-exporter
+    name: "{{ haproxy_exporter_service_name }}"
     state: started
     enabled: true

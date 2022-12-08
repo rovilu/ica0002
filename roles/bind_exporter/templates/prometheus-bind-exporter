@@ -1,1 +1,1 @@
-ARGS="--bind.stats-url http://localhost:8053"
+ARGS="--bind.stats-url http://localhost:{{ bind_exporter_stats_host_port }}"

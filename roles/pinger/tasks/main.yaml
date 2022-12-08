@@ -1,41 +1,41 @@
-- name: Create Pinger system user
+- name: Create Pinger user
   ansible.builtin.user:
-    name: "{{ pinger_user }}"
+    name: "{{ pinger_user_username }}"
     state: present
     system: true
 
-- name: Install required packages
+- name: Install Pinger packages
   ansible.builtin.apt:
-    name: fping
-    state: present
+    name: "{{ pinger_packages }}"
+    state: latest
 
-- name: Install Pinger
-  ansible.builtin.copy:
-    src: pinger.sh
-    dest: "{{ bin_dir }}/"
+- name: Install Pinger binary
+  ansible.builtin.template:
+    src: "{{ pinger_shell }}"
+    dest: "{{ pinger_shell_dir }}/"
     mode: 0755
 
 - name: Configure Pinger service
   ansible.builtin.template:
-    src: pinger.service
-    dest: "{{ systemd_dir }}/"
+    src: "{{ pinger_service }}"
+    dest: "{{ pinger_service_path }}/"
   notify:
     - Reload systemd daemon
 
 - name: Create Pinger directory
   ansible.builtin.file:
-    path: /etc/pinger
+    path: "{{ pinger_etc_dir }}"
     state: directory
 
 - name: Configure Pinger
-  ansible.builtin.copy:
-    src: pinger.conf
-    dest: /etc/pinger/pinger.conf
+  ansible.builtin.template:
+    src: "{{ pinger_conf }}"
+    dest: "{{ pinger_etc_dir }}/{{ pinger_conf }}"
   notify:
     - Restart Pinger service
 
 - name: Start and enable Pinger service
   ansible.builtin.service:
-    name: pinger
+    name: "{{ pinger_service_name }}"
     state: started
     enabled: true

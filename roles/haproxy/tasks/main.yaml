@@ -1,17 +1,17 @@
 - name: Install HAProxy packages
   ansible.builtin.apt:
-    name: haproxy
+    name: "{{ haproxy_packages }}"
     state: latest
 
 - name: Copy HAProxy configuration
   ansible.builtin.template:
-    src: "{{ haproxy_conf_name }}"
-    dest: "{{ haproxy_config_root_dir }}/"
+    src: "{{ haproxy_conf }}"
+    dest: "{{ haproxy_dir }}/"
   notify:
     - Restart HAProxy service
 
-- name: Enable and start HAProxy service
+- name: Start and enable HAProxy service
   ansible.builtin.service:
-    name: haproxy
+    name: "{{ haproxy_service_name }}"
     state: started
     enabled: true

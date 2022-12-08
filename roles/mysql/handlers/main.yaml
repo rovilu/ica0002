@@ -1,6 +1,6 @@
 - name: Restart MySQL service
   ansible.builtin.service:
-    name: mysql
+    name: "{{ mysql_service_name }}"
     state: restarted
 
 - name: Reset MySQL source
@@ -10,18 +10,18 @@
   loop:
     - stopreplica
     - resetprimary
-  when: inventory_hostname == mysql_host
+  when: inventory_hostname == mysql_master_host
 
 - name: Reset MySQL replica
   community.mysql.mysql_replication:
     mode: "{{ item }}"
-    primary_host: "{{ mysql_host }}"
-    primary_user: "{{ mysql_replication_user }}"
-    primary_password: "{{ mysql_replication_password }}"
+    primary_host: "{{ mysql_master_host }}"
+    primary_user: "{{ mysql_replication_user_username }}"
+    primary_password: "{{ mysql_replication_user_password }}"
     login_unix_socket: "{{ mysql_socket }}"
   loop:
     - stopreplica
     - changeprimary
     - resetreplica
     - startreplica
-  when: inventory_hostname != mysql_host
+  when: inventory_hostname != mysql_master_host

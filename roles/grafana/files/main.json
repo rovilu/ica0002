@@ -479,7 +479,7 @@
             "uid": "PBFA97CFB590B2093"
           },
           "editorMode": "code",
-          "expr": "bind_up{instance=\"rovilu-2:9119\"}",
+          "expr": "bind_up{instance=\"rovilu-3:9119\"}",
           "legendFormat": "{{ instance }}",
           "range": true,
           "refId": "A"
@@ -571,7 +571,7 @@
             "uid": "PBFA97CFB590B2093"
           },
           "editorMode": "code",
-          "expr": "bind_up{instance=\"rovilu-1:9119\"}",
+          "expr": "bind_up{instance=~\"rovilu-1:9119|rovilu-2:9119\"}",
           "legendFormat": "{{ instance }}",
           "range": true,
           "refId": "A"

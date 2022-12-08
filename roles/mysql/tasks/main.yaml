@@ -1,57 +1,54 @@
 - name: Install MySQL packages
   ansible.builtin.apt:
-    name:
-      - mysql-server
-      - python3-pymysql
+    name: "{{ mysql_packages }}"
     state: latest
 
-- name: Start and enable MySQL service
-  ansible.builtin.service:
-    name: mysql
-    state: started
-    enabled: true
-
-- name: Configure MySQL daemon
+- name: Configure MySQL client
   ansible.builtin.template:
-    src: override.cnf
-    dest: /etc/mysql/mysql.conf.d/override.cnf
+    src: "{{ mysql_client_conf }}"
+    dest: "{{ mysql_client_conf_path }}/{{ mysql_client_conf }}"
   notify:
     - Restart MySQL service
 
+- name: Start and enable MySQL service
+  ansible.builtin.service:
+    name: "{{ mysql_service_name }}"
+    state: started
+    enabled: true
+
 - name: Create MySQL database
   community.mysql.mysql_db:
-    name: "{{ mysql_agama_db }}"
+    name: "{{ mysql_agama_db_name }}"
     login_unix_socket: "{{ mysql_socket }}"
   notify:
     - Reset MySQL source
     - Reset MySQL replica
 
-- name: Create MySQL user for AGAMA
+- name: Create MySQL AGAMA user
   community.mysql.mysql_user:
-    name: "{{ mysql_agama_user }}"
-    password: "{{ mysql_agama_password }}"
+    name: "{{ mysql_agama_user_username }}"
+    password: "{{ mysql_agama_user_password }}"
     host: "%"
-    priv: "{{ mysql_agama_db }}.*:ALL"
+    priv: "{{ mysql_agama_db_name }}.*:ALL"
     login_unix_socket: "{{ mysql_socket }}"
-  notify:
-    - Restart MySQL service
 
-- name: Create MySQL user for replication
+- name: Create MySQL replication user
   community.mysql.mysql_user:
-    name: "{{ mysql_replication_user }}"
-    password: "{{ mysql_replication_password }}"
+    name: "{{ mysql_replication_user_username }}"
+    password: "{{ mysql_replication_user_password }}"
     host: "%"
     priv: "*.*:REPLICATION SLAVE"
     login_unix_socket: "{{ mysql_socket }}"
-  notify:
-    - Restart MySQL service
 
 - name: Set MySQL server modes
   community.mysql.mysql_variables:
     variable: read_only
-    value: "{{ 'OFF' if inventory_hostname == mysql_host else 'ON' }}"
+    value: "{{ 'OFF' if inventory_hostname == mysql_master_host else 'ON' }}"
     mode: persist
     login_unix_socket: "{{ mysql_socket }}"
   notify:
     - Reset MySQL source
     - Reset MySQL replica
+
+- name: Flush notified handlers
+  ansible.builtin.meta: flush_handlers

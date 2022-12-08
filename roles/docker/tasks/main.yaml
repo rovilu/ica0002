@@ -1,11 +1,10 @@
-- name: Install Docker required package
+- name: Install Docker packages
   ansible.builtin.apt:
-    name:
-     - docker.io
-     - python3-docker
+    name: "{{ docker_packages }}"
+    state: latest
 
-- name: Start and enable Docker
+- name: Start and enable Docker service
   ansible.builtin.service:
-    name: docker
+    name: "{{ docker_service_name }}"
     state: started
     enabled: true

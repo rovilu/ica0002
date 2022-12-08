@@ -1,24 +1,36 @@
 - name: Install Prometheus package
   ansible.builtin.apt:
-    name: prometheus
+    name: "{{ prometheus_packages }}"
     state: latest
 
 - name: Configure Prometheus service
   ansible.builtin.template:
-    src: prometheus.yml
-    dest: /etc/prometheus/prometheus.yml
+    src: "{{ prometheus_conf }}"
+    dest: "{{ prometheus_etc_dir }}/"
   notify:
     - Restart Prometheus service
 
-- name: Expose Prometheus service
+- name: Configure Prometheus service
   ansible.builtin.template:
-    src: prometheus
-    dest: /etc/default/prometheus
+    src: "{{ prometheus_default_conf }}"
+    dest: "{{ prometheus_default_conf_dir }}/"
   notify:
     - Restart Prometheus service
 
 - name: Enable and start Prometheus service
   ansible.builtin.service:
-    name: prometheus
+    name: "{{ prometheus_service_name }}"
     state: started
     enabled: true
+
+- name: Execute Prometheus web check
+  ansible.builtin.uri:
+    url: "{{ prometheus_service_url }}"
+  failed_when: false
+  register: result
+  changed_when: result.status != 200
+  notify:
+    - Restart Prometheus service
+
+- name: Flush notified handlers
+  ansible.builtin.meta: flush_handlers

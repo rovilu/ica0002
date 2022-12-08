@@ -1,10 +1,10 @@
 - name: Configure hosts resolver
   ansible.builtin.template:
-    src: resolv.conf
-    dest: /etc/resolv.conf
+    src: "{{ resolv_conf }}"
+    dest: "{{ resolv_conf_dir }}/"
 
 - name: Stop and disable hosts systemd-resolved service
   ansible.builtin.service:
-    name: systemd-resolved
+    name: "{{ resolv_conf_systemd_resolved_service_name }}"
     state: stopped
     enabled: no

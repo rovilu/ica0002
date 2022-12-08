@@ -1,4 +1,4 @@
 - name: Restart Pinger service
   ansible.builtin.service:
-    name: pinger
+    name: "{{ pinger_service_name }}"
     state: restarted

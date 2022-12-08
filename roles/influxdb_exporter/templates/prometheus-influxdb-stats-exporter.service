@@ -4,8 +4,8 @@ Documentation=
 After=network-online.target
 
 [Service]
-User={{ prometheus_user }}
-ExecStart=/usr/local/bin/prometheus-influxdb-stats-exporter
+User={{ influxdb_exporter_user_username }}
+ExecStart={{ influxdb_exporter_bin_path }}/{{ influxdb_exporter_bin }}
 
 [Install]
 WantedBy=multi-user.target

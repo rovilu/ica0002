@@ -1,61 +1,260 @@
-nginx_port: 80
-nginx_sites_dir: /etc/nginx/sites-enabled
-
-agama_host_port: 8001
-agama_container_port: 8000
 agama_dir: /opt/agama
-agama_urls:
-  - https://raw.githubusercontent.com/hudolejev/agama/master/agama.py
-  - https://raw.githubusercontent.com/hudolejev/agama/master/Dockerfile
+agama_host_port: 8001
+agama_app_url: https://raw.githubusercontent.com/hudolejev/agama/master/agama.py
+agama_dockerfile_url: https://raw.githubusercontent.com/hudolejev/agama/master/Dockerfile
 agama_docker_image_name: agama
 agama_docker_container_name: agama
-agama_container_config_root_dir: /opt/agama
+agama_docker_build_path: "{{ agama.dir }}"
+agama_docker_container_port: 8000
+agama_file_urls: ["{{ agama_app_url }}", "{{ agama_dockerfile_url }}"]
 
-mysql_host: rovilu-2
-mysql_agama_db: agama
-mysql_agama_user: agama
-mysql_agama_password: !vault |
-  $ANSIBLE_VAULT;1.1;AES256
-  65613734633365323836663139326364633733333034336535363631656334356463333932653635
-  6666656430313635643733306462326332366566616639660a326564666166373564326237353038
-  38323539386131643333653639656539633664306136333061396232316638306439336465616666
-  3935393663383733620a366539343836623764343633313465613861356631376433323666306535
-  61613235326263643338623264333961643838643562326535313439376634376237
-mysql_socket: /var/run/mysqld/mysqld.sock
-mysql_replication_user: replication
-mysql_replication_password: !vault |
-  $ANSIBLE_VAULT;1.1;AES256
-  30386464656434326662346436303836376630663337633666386636303064346138343863643135
-  3265386236306231653861613361663036343865643331300a303332636265346262633864393763
-  62303765616335336135643335653566363436626239306465346266623164636231616532636338
-  3361316564656161350a393836656536343639373861636462376239323366636666663431656132
-  65353161353630613436363763313536333262363762656537643836366134633764343562356662
-  3064333030626638643033623439376465346364613331346464
-mysql_backup_host: "{{ groups['db_servers'] | reject('eq', mysql_host) | first | default(mysql_host) }}"
-node_id: "{{ (ansible_port / 100) | int }}"
+backup_user_home: /home/{{ backup_user_username }}
+backup_user_home_restore: "{{ backup_user_home }}/restore"
+backup_user_username: backup
+backup_host_ipaddr: 192.168.42.132
+backup_host_user_username: rovilu
+backup_host_domain_name: backup
+backup_host_fqdn: "{{ backup_host_domain_name }}.{{ bind_main_zone }}"
+backup_host_ssh_key: ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIEu6pFFWyuRrl4WGFPQGElYN9txwTGm2wSntcpVAaN90
 
-bind_db_file: /var/cache/bind/db.{{ bind_domain }}
-bind_db_ptr_file: /var/cache/bind/db.{{ bind_ptr_domain }}
+bind_main_zone: vilur.io
+bind_reverse_zone: 168.192.in-addr.arpa
+bind_service_name: bind9
+bind_allow_query: [192.168.42.0/23, 127.0.0.0/8]
+bind_forwarders: [1.1.1.1, 8.8.8.8, 9.9.9.9, 9.9.9.10]
+bind_etc_dir: /etc/bind
+bind_var_dir: /var/cache/bind
+bind_named_conf: named.conf
+bind_master_host: rovilu-3
+bind_named_conf_options: named.conf.options
+bind_key_algorithm: hmac-sha256
 bind_transfer_key_name: transfer.key
 bind_nsupdate_key_name: nsupdate.key
-bind_master_host: rovilu-2
-bind_domain: vilur.io
-bind_ptr_domain: 168.192.in-addr.arpa
-bind_allow_query: 192.168.42.0/23; 127.0.0.0/8;
-bind_forwarders: 1.1.1.1; 8.8.8.8; 9.9.9.9; 9.9.9.10;
-bind_records:
-  - { name: backup, host: "{{ backup_host_ip }}", type: "A" }
-  - { name: grafana, host: rovilu-2, type: "CNAME" }
-  - { name: influxdb, host: rovilu-2, type: "CNAME" }
-  - { name: lb1, host: rovilu-1, type: "CNAME" }
-  - { name: lb2, host: rovilu-2, type: "CNAME" }
-  - { name: mysql1, host: rovilu-1, type: "CNAME" }
-  - { name: mysql2, host: rovilu-2, type: "CNAME" }
-  - { name: ns1, host: rovilu-1, type: "CNAME" }
-  - { name: ns2, host: rovilu-2, type: "CNAME" }
-  - { name: prometheus, host: rovilu-2, type: "CNAME" }
-  - { name: web1, host: rovilu-1, type: "CNAME" }
-  - { name: web2, host: rovilu-2, type: "CNAME" }
+bind_main_zone_file: db.{{ bind_main_zone }}
+bind_reverse_zone_file: db.{{ bind_reverse_zone }}
+bind_zone_files: ["{{ bind_main_zone_file }}", "{{ bind_reverse_zone_file }}"]
+bind_main_zone_records:
+  - { record: backup, value: "{{ backup_host_ipaddr }}", type: "A" }
+  - { record: grafana, value: rovilu-3, type: "CNAME" }
+  - { record: influxdb, value: rovilu-3, type: "CNAME" }
+  - { record: lb1, value: rovilu-1, type: "CNAME" }
+  - { record: lb2, value: rovilu-2, type: "CNAME" }
+  - { record: mysql1, value: rovilu-1, type: "CNAME" }
+  - { record: mysql2, value: rovilu-2, type: "CNAME" }
+  - { record: ns1, value: rovilu-1, type: "CNAME" }
+  - { record: ns2, value: rovilu-2, type: "CNAME" }
+  - { record: ns3, value: rovilu-3, type: "CNAME" }
+  - { record: prometheus, value: rovilu-3, type: "CNAME" }
+  - { record: web1, value: rovilu-1, type: "CNAME" }
+  - { record: web2, value: rovilu-2, type: "CNAME" }
+bind_reverse_zone_records:
+  - { record: "{{ bind_host_backup_last_two_octets }}", value: backup }
+  - { record: "{{ bind_host_1_last_two_octets }}", value: rovilu-1 }
+  - { record: "{{ bind_host_2_last_two_octets }}", value: rovilu-2 }
+  - { record: "{{ bind_host_3_last_two_octets }}", value: rovilu-3 }
+bind_packages: [bind9, python3-dns, python3-dnspython]
+bind_host_1_last_two_octets: "{{ hostvars['rovilu-1']['ansible_default_ipv4']['address'].split('.')[-2:] | reverse | join('.') }}"
+bind_host_2_last_two_octets: "{{ hostvars['rovilu-2']['ansible_default_ipv4']['address'].split('.')[-2:] | reverse | join('.') }}"
+bind_host_3_last_two_octets: "{{ hostvars['rovilu-3']['ansible_default_ipv4']['address'].split('.')[-2:] | reverse | join('.') }}"
+bind_host_backup_last_two_octets: "{{ backup_host_ipaddr.split('.')[-2:] | reverse | join('.') }}"
+
+bind_exporter_packages: [prometheus-bind-exporter]
+bind_exporter_service_name: prometheus-bind-exporter
+bind_exporter_conf: prometheus-bind-exporter
+bind_exporter_conf_dir: /etc/default
+bind_exporter_stats_host_port: 8053
+bind_exporter_host_port: 9119
+
+docker_service_name: docker
+docker_packages: [docker.io, python3-docker]
+
+grafana_user_username: admin
+grafana_docker_container_name: grafana
+grafana_docker_image_name: grafana/grafana
+grafana_host_port: 3001
+grafana_docker_container_port: 3000
+grafana_docker_dir: /etc/grafana
+grafana_docker_provisioning_dir: "{{ grafana_docker_dir }}/provisioning"
+grafana_docker_dashboards_dir: "{{ grafana_docker_provisioning_dir }}/dashboards"
+grafana_docker_datasources_dir: "{{ grafana_docker_provisioning_dir }}/datasources"
+grafana_dir: /opt/grafana
+grafana_provisioning_dir: "{{ grafana_dir }}/provisioning"
+grafana_dashboards_dir: "{{ grafana_provisioning_dir }}/dashboards"
+grafana_datasources_dir: "{{ grafana_provisioning_dir }}/datasources"
+grafana_dirs:
+  - "{{ grafana_dashboards_dir }}"
+  - "{{ grafana_datasources_dir }}"
+grafana_files:
+  - { src: main.json, dest: "{{ grafana_dashboards_dir }}/" }
+  - { src: mysql.json, dest: "{{ grafana_dashboards_dir }}/" }
+  - { src: syslog.json, dest: "{{ grafana_dashboards_dir }}/" }
+grafana_templates:
+  - { src: dashboards.yml, dest: "{{ grafana_dashboards_dir }}/" }
+  - { src: datasources.yml, dest: "{{ grafana_datasources_dir }}/" }
+  - { src: grafana.ini, dest: "{{ grafana_dir }}/" }
+
+haproxy_service_name: haproxy
+haproxy_conf: haproxy.cfg
+haproxy_dir: /etc/haproxy
+haproxy_stats_host_port: 9188
+haproxy_agama_host_port: 88
+haproxy_packages: [haproxy]
+
+haproxy_exporter_host_port: 9101
+haproxy_exporter_service_name: prometheus-haproxy-exporter
+haproxy_exporter_conf: prometheus-haproxy-exporter
+haproxy_exporter_conf_dir: /etc/default
+haproxy_exporter_packages: [prometheus-haproxy-exporter]
+
+influxdb_host_port: 8086
+influxdb_service_name: influxdb
+influxdb_conf: influxdb.conf
+influxdb_etc_dir: /etc/influxdb
+influxdb_var_dir: /var/lib/influxdb/
+influxdb_packages: [https://dl.influxdata.com/influxdb/releases/influxdb_1.8.10_amd64.deb]
+
+influxdb_backup_dir: "{{ backup_user_home }}/influxdb"
+influxdb_backup_restore_dir: "{{ backup_user_home_restore }}/influxdb"
+influxdb_backup_cron_dir: /etc/cron.d
+influxdb_backup_cron_file: "{{ influxdb_backup_cron_dir }}/influxdb-backup"
+influxdb_backup_host_dir: influxdb
+influxdb_backup_dirs: ["{{ influxdb_backup_dir }}", "{{ influxdb_backup_restore_dir }}"]
+
+influxdb_exporter_download_url: https://github.com/carlpett/influxdb_stats_exporter/releases/download/v0.1.1/influx_stats_exporter_linux_386
+influxdb_exporter_bin_path: /usr/local/bin
+influxdb_exporter_bin: prometheus-influxdb-stats-exporter
+influxdb_exporter_service: "{{ influxdb_exporter_bin }}.service"
+influxdb_exporter_service_path: /etc/systemd/system
+influxdb_exporter_service_name: prometheus-influxdb-stats-exporter
+influxdb_exporter_user_username: root
+
+init_cache_valid_time: 7200
+init_packages: [ca-certificates]
+
+keepalived_service_name: keepalived
+keepalived_user_username: keepalived_script
+keepalived_group_name: "{{ keepalived_user_username }}"
+keepalived_user_home: /home/keepalived_script
+keepalived_conf: keepalived.conf
+keepalived_etc_dir: /etc/keepalived
+keepalived_master_host: rovilu-1
+keepalived_healthcheck_script: healthcheck.sh
+keepalived_packages: [keepalived]
+
+keepalived_exporter_host_port: 9165
+keepalived_exporter_download_dir: keepalived-exporter-1.2.0.linux-amd64
+keepalived_exporter_download_file: keepalived-exporter
+keepalived_exporter_download_url: http://backup/{{ keepalived_exporter_download_tar }}
+keepalived_exporter_download_tar: keepalived-exporter-1.2.0.linux-amd64.tar.gz
+keepalived_exporter_download_tar_path: /opt
+keepalived_exporter_bin: prometheus-keepalived-exporter
+keepalived_exporter_service_name: prometheus-keepalived-exporter
+keepalived_exporter_bin_path: /usr/local/bin
+keepalived_exporter_service: "{{ keepalived_exporter_bin }}.service"
+keepalived_exporter_service_path: /etc/systemd/system
+keepalived_exporter_user_username: root
+
+mysql_service_name: mysql
+mysql_master_host: rovilu-2
+mysql_agama_user_username: agama
+mysql_agama_db_name: agama
+mysql_replication_user_username: replication
+mysql_socket: /var/run/mysqld/mysqld.sock
+mysql_etc_dir: /etc/mysql
+mysql_client_conf: override.cnf
+mysql_client_conf_path: "{{ mysql_etc_dir }}/mysql.conf.d"
+mysql_node_id: "{{ (ansible_port / 100) | int }}"
+mysql_packages: [mysql-server, python3-pymysql]
+
+mysql_backup_dir: "{{ backup_user_home }}/mysql"
+mysql_backup_restore_dir: "{{ backup_user_home_restore }}/mysql"
+mysql_backup_user_username: "{{ backup_user_username }}"
+mysql_backup_client_conf: .my.cnf
+mysql_backup_cron_dir: /etc/cron.d
+mysql_backup_cron_file: "{{ mysql_backup_cron_dir }}/mysql-backup"
+mysql_backup_host_dir: mysql
+mysql_backup_host: "{{ groups['db_servers'] | reject('eq', mysql_master_host) | first | default(mysql_host) }}"
+mysql_backup_dirs: ["{{ mysql_backup_dir }}", "{{ mysql_backup_restore_dir }}"]
+
+mysql_exporter_service_name: prometheus-mysqld-exporter
+mysql_exporter_user_username: prometheus
+mysql_exporter_client_conf: .mysqld_exporter.cnf
+mysql_exporter_client_conf_path: /etc
+mysql_exporter_conf: prometheus-mysqld-exporter
+mysql_exporter_conf_dir: /etc/default
+mysql_exporter_host_port: 9104
+mysql_exporter_packages: [prometheus-mysqld-exporter]
+
+nginx_host_port: 80
+nginx_service_name: nginx
+nginx_stub_stats_url: http://localhost/stub_status
+nginx_conf: default
+nginx_etc_dir: /etc/nginx
+nginx_sites_dir: "{{ nginx_etc_dir }}/sites-enabled"
+nginx_packages: [nginx]
+
+nginx_exporter_host_port: 9113
+nginx_exporter_service_name: prometheus-nginx-exporter
+nginx_exporter_conf: prometheus-nginx-exporter
+nginx_exporter_conf_dir: /etc/default
+nginx_exporter_packages: [prometheus-nginx-exporter]
+
+node_exporter_service_name: prometheus-node-exporter
+node_exporter_host_port: 9100
+node_exporter_packages: [prometheus-node-exporter]
+
+pinger_service_name: pinger
+pinger_service_path: /etc/systemd/system
+pinger_etc_dir: /etc/pinger
+pinger_conf: pinger.conf
+pinger_user_username: pinger
+pinger_shell: pinger.sh
+pinger_shell_dir: /usr/local/bin
+pinger_service: "{{ pinger_service_name }}.service"
+pinger_packages: [fping]
+
+prometheus_service_name: prometheus
+prometheus_service_url: http://localhost/prometheus
+prometheus_host_port: 9090
+prometheus_user_username: prometheus
+prometheus_conf: prometheus.yml
+prometheus_etc_dir: /etc/prometheus
+prometheus_default_conf: prometheus
+prometheus_default_conf_dir: /etc/default
+prometheus_packages: [prometheus]
+
+resolv_conf: resolv.conf
+resolv_conf_dir: /etc
+resolv_conf_systemd_resolved_service_name: systemd-resolved
+
+rsyslog_service_name: rsyslog
+rsyslog_conf: 50-telegraf.conf
+rsyslog_etc_dir: /etc/rsyslog.d
+rsyslog_host_port: 6514
+rsyslog_master_host: rovilu-3
+
+telegraf_service_name: telegraf
+telegraf_influxdb_db_name: telegraf
+telegraf_apt_key_url: https://repos.influxdata.com/influxdb.key
+telegraf_apt_key_keyring: /etc/apt/trusted.gpg.d/influxdb.gpg
+telegraf_apt_repo: deb [signed-by=/etc/apt/trusted.gpg.d/influxdb.gpg] https://repos.influxdata.com/debian stable main
+telegraf_apt_filename: influxdata.list
+telegraf_conf: telegraf.conf
+telegraf_etc_dir: /etc/telegraf
+telegraf_packages: [telegraf]
+
+users:
+  - { login: roman, pubkey: 'https://github.com/romankuchin.keys' }
+  - { login: juri, pubkey: 'https://github.com/hudolejev.keys' }
+
+backup_user_password: !vault |
+  $ANSIBLE_VAULT;1.1;AES256
+  30333539306632386436303835666532623763383931303336353964363634653861343338396338
+  3332613139346563393165396236383336343934663133320a356234306633306265643161353139
+  61353134343434316632303732313463306566626461303332376536346563643038616466646532
+  3966346266316437620a353437306566393536373638313030633862386663343337376266323536
+  63346133333565653634396166313866613466313065306238316665316130363536653430356430
+  3530313262303864356139356539366533336532376631613231
 bind_transfer_key_secret: !vault |
   $ANSIBLE_VAULT;1.1;AES256
   64343935626138346334646263313136663338613238666532323133633735383034643462643232
@@ -72,123 +271,32 @@ bind_nsupdate_key_secret: !vault |
   6361616262623865360a663532306363323536653766313331623963396236356534346439373837
   31343838353839393037363331623562366161356363366432643230306461393664353831346666
   3639616365316563316566343637633363333934386164333332
-
-cron_dir: /etc/cron.d
-
-backup_host_ip: 192.168.42.132
-backup_host: backup
-backup_host_fqdn: "{{ backup_host }}.{{ bind_domain }}"
-backup_host_ssh_key: ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIEu6pFFWyuRrl4WGFPQGElYN9txwTGm2wSntcpVAaN90
-backup_host_user: rovilu
-backup_user: backup
-backup_user_home: /home/{{ backup_user }}
-backup_user_home_mysql: "{{ backup_user_home }}/mysql"
-backup_user_home_restore: "{{ backup_user_home }}/restore"
-backup_user_home_influxdb: "{{ backup_user_home }}/influxdb"
-backup_user_home_restore_mysql: "{{ backup_user_home_restore }}/mysql"
-backup_user_home_restore_influxdb: "{{ backup_user_home_restore }}/influxdb"
-backup_password: !vault |
-  $ANSIBLE_VAULT;1.1;AES256
-  30333539306632386436303835666532623763383931303336353964363634653861343338396338
-  3332613139346563393165396236383336343934663133320a356234306633306265643161353139
-  61353134343434316632303732313463306566626461303332376536346563643038616466646532
-  3966346266316437620a353437306566393536373638313030633862386663343337376266323536
-  63346133333565653634396166313866613466313065306238316665316130363536653430356430
-  3530313262303864356139356539366533336532376631613231
-backup_mysql_cron_file: "{{ cron_dir }}/mysql-backup"
-backup_mysql_dump: rm -rf {{ backup_user_home_mysql }}/* && mysqldump {{ mysql_agama_db }} > {{ backup_user_home_mysql }}/{{ mysql_agama_db }}.sql
-backup_mysql_job: "{{ backup_mysql_dump }} && duplicity --no-encryption {{ item }} {{ backup_user_home_mysql }} rsync://{{ backup_host_user }}@{{ backup_host_fqdn }}/mysql"
-backup_influxdb_cron_file: "{{ cron_dir }}/influxdb-backup"
-backup_influxdb_dump: rm -rf {{ backup_user_home_influxdb }}/* && influxd backup -portable -database {{ influxdb_db }} {{ backup_user_home_influxdb }}
-backup_influxdb_job: "{{ backup_influxdb_dump }} && duplicity --no-encryption {{ item }} {{ backup_user_home_influxdb }} rsync://{{ backup_host_user }}@{{ backup_host_fqdn }}/influxdb"
-
-monitoring_host: "{{ hostvars['rovilu-2']['ansible_host'] }}"
-monitoring_host_port: 5480
-monitoring_host_int: "{{ hostvars['rovilu-2']['ansible_default_ipv4']['address'] }}"
-
-prometheus_host: "{{ monitoring_host }}"
-prometheus_host_int: "{{ monitoring_host_int }}"
-prometheus_host_port: "{{ monitoring_host_port }}"
-prometheus_service_port: 9090
-prometheus_user: prometheus
-
-monitoring_docker_host_address: 172.17.0.1
-
-grafana_host: "{{ monitoring_host }}"
-grafana_host_int: "{{ monitoring_host_int }}"
-grafana_host_port: "{{ monitoring_host_port }}"
-grafana_url: "http://{{ grafana_host }}:{{ grafana_host_port }}/grafana"
-grafana_service_port: 3001
-grafana_container_port: 3000
-grafana_user: admin
-grafana_email: "{{ grafana_user }}@localhost"
-grafana_password: !vault |
+grafana_user_password: !vault |
   $ANSIBLE_VAULT;1.1;AES256
   65396261343562323164363263643032613165396335636661333137643730323936386336663363
   3764623766633332393231623334303537346130393235300a306662383831313838323836366566
   36323937333334303037313863613935336134316462326264353339363662393362616165613136
   6639326261633466350a343261383532636462393566616563643435633562353536656136636265
   61613032326235653233323235303063623866623638343934653262636665353031
-
-grafana_docker_container_name: grafana
-grafana_docker_container_image: grafana/grafana
-grafana_container_config_root_dir: /etc/grafana
-grafana_container_config_provisioning_dir: "{{ grafana_container_config_root_dir }}/provisioning"
-grafana_container_config_dashboards_dir: "{{ grafana_container_config_provisioning_dir }}/dashboards"
-grafana_container_config_datasources_dir: "{{ grafana_container_config_provisioning_dir }}/datasources"
-grafana_config_root_dir: /opt/grafana
-grafana_config_provisioning_dir: "{{ grafana_config_root_dir }}/provisioning"
-grafana_config_dashboards_dir: "{{ grafana_config_provisioning_dir }}/dashboards"
-grafana_config_datasources_dir: "{{ grafana_config_provisioning_dir }}/datasources"
-
-grafana_dirs:
-  - "{{ grafana_config_dashboards_dir }}"
-  - "{{ grafana_config_datasources_dir }}"
-grafana_resources:
-  - { src: main.json, dest: "{{ grafana_config_dashboards_dir }}/" }
-  - { src: mysql.json, dest: "{{ grafana_config_dashboards_dir }}/" }
-  - { src: syslog.json, dest: "{{ grafana_config_dashboards_dir }}/" }
-grafana_configs:
-  - { src: dashboards.yml, dest: "{{ grafana_config_dashboards_dir }}/" }
-  - { src: datasources.yml, dest: "{{ grafana_config_datasources_dir }}/" }
-  - { src: grafana.ini, dest: "{{ grafana_config_root_dir }}/" }
-
-node_exporter_port: 9100
-nginx_exporter_port: 9113
-bind_exporter_port: 9119
-mysql_exporter_port: 9104
-mysql_exporter_password: !vault |
+mysql_agama_user_password: !vault |
+  $ANSIBLE_VAULT;1.1;AES256
+  65613734633365323836663139326364633733333034336535363631656334356463333932653635
+  6666656430313635643733306462326332366566616639660a326564666166373564326237353038
+  38323539386131643333653639656539633664306136333061396232316638306439336465616666
+  3935393663383733620a366539343836623764343633313465613861356631376433323666306535
+  61613235326263643338623264333961643838643562326535313439376634376237
+mysql_replication_user_password: !vault |
+  $ANSIBLE_VAULT;1.1;AES256
+  30386464656434326662346436303836376630663337633666386636303064346138343863643135
+  3265386236306231653861613361663036343865643331300a303332636265346262633864393763
+  62303765616335336135643335653566363436626239306465346266623164636231616532636338
+  3361316564656161350a393836656536343639373861636462376239323366636666663431656132
+  65353161353630613436363763313536333262363762656537643836366134633764343562356662
+  3064333030626638643033623439376465346364613331346464
+mysql_exporter_user_password: !vault |
   $ANSIBLE_VAULT;1.1;AES256
   62393962376534333933316161303863346364653535653863656664336331343134353765613237
   6533383531656662656534366533626136613465623730330a623835643130333765373663363261
   38623130633261386331393832343632646637616139306230623431323466633439323434613763
   3633616463363033660a303962653237383734323962383763343639633834623061353334626630
   63663765363765386339343635623537333864626165613563303864666366363938
-pinger_user: pinger
-influxdb_host_int: "{{ monitoring_host_int }}"
-influxdb_db: telegraf
-influxdb_port: 8086
-syslog_port: 6514
-
-keepalived_conf_name: keepalived.conf
-keepalived_user: keepalived_script
-keepalived_healthcheck_script_name: healthcheck.sh
-keepalived_config_root_dir: /etc/keepalived
-keepalived_script_user_home_dir: /home/keepalived_script
-keepalived_exporter_binary_dir_name: keepalived-exporter-1.2.0.linux-amd64
-keepalived_exporter_binary_archive_name: "{{ keepalived_exporter_binary_dir_name }}.tar.gz"
-keepalived_exporter_binary_archive_path: /opt/{{ keepalived_exporter_binary_archive_name }}
-keepalived_exporter_binary_dir_path: /opt/{{ keepalived_exporter_binary_dir_name }}
-keepalived_exporter_binary_url: http://backup/{{ keepalived_exporter_binary_archive_name }}
-keepalived_exporter_binary_name: prometheus-keepalived-exporter
-keepalived_exporter_service_name: prometheus-keepalived-exporter
-keepalived_exporter_user: root
-keepalived_exporter_port: 9165
-
-haproxy_stats_port: 9188
-haproxy_conf_name: haproxy.cfg
-haproxy_config_root_dir: /etc/haproxy
-haproxy_exporter_port: 9101
-
-bin_dir: /usr/local/bin
-systemd_dir: /etc/systemd/system

@@ -1,4 +1,4 @@
-- name: Restart Grafana Docker container
+- name: Restart Grafana container
   community.docker.docker_container:
     name: "{{ grafana_docker_container_name }}"
     restart: true

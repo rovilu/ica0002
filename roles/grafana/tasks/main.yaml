@@ -1,31 +1,30 @@
 - name: Create Grafana directories
   ansible.builtin.file:
-    path: "{{ item }}"
+    path: "{{ grafana_dirs }}"
     state: directory
     recurse: true
-  loop: "{{ grafana_dirs }}"
 
-- name: Copy Grafana resources
+- name: Copy Grafana files
   ansible.builtin.copy:
     src: "{{ item.src }}"
     dest: "{{ item.dest }}"
-  loop: "{{ grafana_resources }}"
+  with_items: "{{ grafana_files }}"
   notify:
-    - Restart Grafana Docker container
+    - Restart Grafana container
 
-- name: Copy Grafana configs
+- name: Add Grafana templates
   ansible.builtin.template:
     src: "{{ item.src }}"
     dest: "{{ item.dest }}"
-  loop: "{{ grafana_configs }}"
+  with_items: "{{ grafana_templates }}"
   notify:
-    - Restart Grafana Docker container
+    - Restart Grafana container
 
 - name: Run Grafana Docker container
   community.docker.docker_container:
     name: "{{ grafana_docker_container_name }}"
-    image: "{{ grafana_docker_container_image }}"
-    volumes: "{{ grafana_config_root_dir }}:{{ grafana_container_config_root_dir }}"
-    published_ports: "{{ grafana_service_port }}:{{ grafana_container_port }}"
+    image: "{{ grafana_docker_image_name }}"
+    volumes: "{{ grafana_dir }}:{{ grafana_docker_dir }}"
+    published_ports: "{{ grafana_host_port }}:{{ grafana_docker_container_port }}"
   notify:
-    - Restart Grafana Docker container
+    - Restart Grafana container

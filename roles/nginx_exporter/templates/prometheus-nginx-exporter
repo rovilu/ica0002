@@ -1,1 +1,1 @@
-ARGS="--nginx.scrape-uri=http://{{ ansible_default_ipv4['address'] }}:{{ nginx_port }}/stub_status"
+ARGS="--nginx.scrape-uri=http://localhost:{{ nginx_host_port }}/stub_status"

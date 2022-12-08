@@ -1,4 +1,4 @@
-ARGS="--config.my-cnf /etc/.mysqld_exporter.cnf \
+ARGS="--config.my-cnf {{ mysql_exporter_client_conf_path }}/{{ mysql_exporter_client_conf }} \
       --collect.global_status \
       --collect.info_schema.innodb_metrics \
       --collect.auto_increment.columns \
@@ -15,4 +15,4 @@ ARGS="--config.my-cnf /etc/.mysqld_exporter.cnf \
       --collect.perf_schema.indexiowaits \
       --collect.perf_schema.tableiowaits \
       --collect.slave_status \
-      --web.listen-address=0.0.0.0:{{ mysql_exporter_port }}"
+      --web.listen-address=0.0.0.0:{{ mysql_exporter_host_port }}"

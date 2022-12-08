@@ -1,11 +1,11 @@
 key "{{ bind_transfer_key_name }}" {
-    algorithm hmac-sha256;
+    algorithm {{ bind_key_algorithm }};
     secret "{{ bind_transfer_key_secret }}";
 };
 
 {% if inventory_hostname in groups['dns_masters'] %}
 key "{{ bind_nsupdate_key_name }}" {
-    algorithm hmac-sha256;
+    algorithm {{ bind_key_algorithm }};
     secret "{{ bind_nsupdate_key_secret }}";
 };
 {% endif %}

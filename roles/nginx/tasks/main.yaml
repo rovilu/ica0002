@@ -1,17 +1,29 @@
 - name: Install Nginx package
   ansible.builtin.apt:
-    name: nginx
+    name: "{{ nginx_packages }}"
     state: latest
 
 - name: Configure Nginx enabled sites
   ansible.builtin.template:
-    src: default
-    dest: /etc/nginx/sites-enabled/default
+    src: "{{ nginx_conf }}"
+    dest: "{{ nginx_sites_dir }}/"
   notify:
     - Restart Nginx service
 
 - name: Start and enable Nginx service
   ansible.builtin.service:
-    name: nginx
+    name: "{{ nginx_service_name }}"
     state: started
     enabled: true
+
+- name: Execute stats page web check
+  ansible.builtin.uri:
+    url: "{{ nginx_stub_stats_url }}"
+  failed_when: false
+  register: result
+  changed_when: result.status != 200
+  notify:
+    - Restart Nginx service
+
+- name: Flush notified handlers
+  ansible.builtin.meta: flush_handlers

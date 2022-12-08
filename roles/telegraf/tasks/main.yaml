@@ -1,0 +1,30 @@
+- name: Add Telegraf APT key
+  ansible.builtin.apt_key:
+    url: "{{ telegraf_apt_key_url }}"
+    state: present
+    keyring: "{{ telegraf_apt_key_keyring }}"
+
+- name: Add Telegraf APT repositories
+  ansible.builtin.apt_repository:
+    repo: "{{ telegraf_apt_repo }}"
+    state: present
+    filename: "{{ telegraf_apt_filename }}"
+
+- name: Install Telegraf packages
+  ansible.builtin.apt:
+    name: "{{ telegraf_packages }}"
+    state: present
+    update_cache: true
+
+- name: Configure Telegraf
+  ansible.builtin.template:
+    src: "{{ telegraf_conf }}"
+    dest: "{{ telegraf_etc_dir }}"
+  notify:
+    - Restart Telegraf service
+
+- name: Start and enable Telegraf service
+  ansible.builtin.service:
+    name: "{{ telegraf_service_name }}"
+    state: started
+    enabled: true

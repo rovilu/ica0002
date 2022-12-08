@@ -10,7 +10,7 @@ datasources:
   - name: InfluxDB
     type: influxdb
     access: proxy
-    database: telegraf
-    url: http://localhost:{{ influxdb_port }}
+    database: "{{ telegraf_influxdb_db_name }}"
+    url: http://influxdb:{{ influxdb_host_port }}
     jsonData:
       httpMode: GET

@@ -1,3 +1,0 @@
-users:
-  - { login: roman, pubkey: 'https://github.com/romankuchin.keys' }
-  - { login: juri, pubkey: 'https://github.com/hudolejev.keys' }

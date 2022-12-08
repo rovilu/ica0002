@@ -3,15 +3,15 @@
   tasks:
     - name: Download MySQL database backup
       ansible.builtin.shell: |
-        rm -rf {{ backup_user_home_restore_mysql }}/*
-        sudo -u {{ backup_user }} duplicity --no-encryption restore \
-          rsync://{{ backup_host_user }}@{{ backup_host_fqdn }}/mysql \
-          {{ backup_user_home_restore_mysql }}
+        rm -rf {{ mysql_backup_dir }}/*
+        sudo -u {{ backup_user_username }} duplicity --no-encryption restore \
+          rsync://{{ backup_host_user_username }}@{{ backup_host_fqdn }}/{{ mysql_backup_host_dir }} \
+          {{ mysql_backup_restore_dir }}
 
     - name: Grant executable permissions to backup script
       ansible.builtin.file:
-        path: "{{ backup_user_home_restore_mysql }}/{{ mysql_agama_db }}.sql"
+        path: "{{ mysql_backup_restore_dir }}/{{ mysql_agama_db_name }}.sql"
         mode: 0660
 
     - name: Restore MySQL database
-      ansible.builtin.shell: mysql {{ mysql_agama_db }} < {{ backup_user_home_restore_mysql }}/{{ mysql_agama_db }}.sql
+      ansible.builtin.shell: mysql {{ mysql_agama_db_name }} < {{ mysql_backup_restore_dir }}/{{ mysql_agama_db_name }}.sql

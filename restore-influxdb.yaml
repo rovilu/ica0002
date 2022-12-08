@@ -1,25 +1,25 @@
-- name: Restore MySQL database
+- name: Restore InfluxDB database
   hosts: monitoring_servers
   tasks:
     - name: Download InfluxDB backup
       ansible.builtin.shell: |
-        rm -rf {{ backup_user_home_restore_influxdb }}/*
-        sudo -u {{ backup_user }} duplicity --no-encryption restore \
-          rsync://{{ backup_host_user }}@{{ backup_host_fqdn }}/influxdb \
-          {{ backup_user_home_restore_influxdb }}
+        rm -rf {{ influxdb_backup_dir }}/*
+        sudo -u {{ backup_user_username }} duplicity --no-encryption restore \
+          rsync://{{ backup_host_user_username }}@{{ backup_host_fqdn }}/{{ influxdb_backup_host_dir }} \
+          {{ influxdb_backup_restore_dir }}
 
     - name: Stop Telegraf service
       ansible.builtin.service:
-        name: telegraf
+        name: "{{ telegraf_service_name }}"
         state: stopped
 
     - name: Restore InfluxDB database
       ansible.builtin.shell: |
-        influx -execute 'DROP DATABASE {{ influxdb_db }}'
-        influxd restore -portable -database {{ influxdb_db }} {{ backup_user_home_restore_influxdb }}
+        influx -execute 'DROP DATABASE {{ telegraf_influxdb_db_name }}'
+        influxd restore -portable -database {{ telegraf_influxdb_db_name }} {{ influxdb_backup_restore_dir }}
       ignore_errors: true
 
     - name: Stop Telegraf service
       ansible.builtin.service:
-        name: telegraf
+        name: "{{ telegraf_service_name }}"
         state: started

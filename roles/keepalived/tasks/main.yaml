@@ -1,30 +1,30 @@
 - name: Install Keepalived packages
   ansible.builtin.apt:
-    name: keepalived
+    name: "{{ keepalived_packages }}"
 
-- name: Create keepalived user
+- name: Create Keepalived user
   ansible.builtin.user:
-    name: "{{ keepalived_user }}"
+    name: "{{ keepalived_user_username }}"
 
-- name: Copy Keepalived configuration
+- name: Configure Keepalived service
   ansible.builtin.template:
-    src: "{{ keepalived_conf_name }}"
-    dest: "{{ keepalived_config_root_dir }}/"
+    src: "{{ keepalived_conf }}"
+    dest: "{{ keepalived_etc_dir }}/"
   notify:
     - Restart Keepalived service
 
-- name: Copy Keepalived healthcheck script
-  ansible.builtin.copy:
-    src: "{{ keepalived_healthcheck_script_name }}"
-    dest: "{{ keepalived_script_user_home_dir }}/"
-    owner: "{{ keepalived_user }}"
-    group: "{{ keepalived_user }}"
+- name: Add Keepalived healthcheck script
+  ansible.builtin.template:
+    src: "{{ keepalived_healthcheck_script }}"
+    dest: "{{ keepalived_user_home }}/"
+    owner: "{{ keepalived_user_username }}"
+    group: "{{ keepalived_group_name }}"
     mode: 0700
   notify:
     - Restart Keepalived service
 
-- name: Enable and start Keepalived service
+- name: Start and enable Keepalived service
   ansible.builtin.service:
-    name: keepalived
+    name: "{{ keepalived_service_name }}"
     state: started
-    enabled: yes
+    enabled: true

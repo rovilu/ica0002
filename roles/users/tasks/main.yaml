@@ -4,13 +4,11 @@
     create_home: true
     groups: sudo
     state: present
-  with_items:
-    - "{{ users }}"
+  with_items: "{{ users }}"
 
 - name: Add required users SSH pubkeys
   ansible.posix.authorized_key:
     user: "{{ item.login }}"
     key: "{{ item.pubkey }}"
     state: present
-  with_items:
-    - "{{ users }}"
+  with_items: "{{ users }}"

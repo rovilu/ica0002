@@ -1,12 +1,12 @@
 - name: Install Prometheus MySQL Exporter package
   ansible.builtin.apt:
-    name: prometheus-mysqld-exporter
+    name: "{{ mysql_exporter_packages }}"
     state: latest
 
 - name: Create MySQL user for Prometheus MySQL Exporter
   community.mysql.mysql_user:
-    name: "{{ prometheus_user }}"
-    password: "{{ mysql_exporter_password }}"
+    name: "{{ mysql_exporter_user_username }}"
+    password: "{{ mysql_exporter_user_password }}"
     host: "%"
     priv: "*.*:PROCESS,REPLICATION CLIENT,SELECT"
     resource_limits:
@@ -15,22 +15,24 @@
 
 - name: Configure MySQL client for Prometheus MySQL Exporter
   ansible.builtin.template:
-    src: .mysqld_exporter.cnf
-    dest: /etc/.mysqld_exporter.cnf
+    src: "{{ mysql_exporter_client_conf }}"
+    dest: "{{ mysql_exporter_client_conf_path }}/{{ mysql_exporter_client_conf }}"
     mode: 0600
-    owner: "{{ prometheus_user }}"
+    owner: "{{ mysql_exporter_user_username }}"
   notify:
     - Restart Prometheus MySQL Exporter service
 
-- name: Expose Prometheus MySQL Exporter service
+- name: Configure Prometheus MySQL Exporter service
   ansible.builtin.template:
-    src: prometheus-mysqld-exporter
-    dest: /etc/default/prometheus-mysqld-exporter
+    src: "{{ mysql_exporter_conf }}"
+    dest: "{{ mysql_exporter_conf_dir }}/"
   notify:
     - Restart Prometheus MySQL Exporter service
 
 - name: Start and enable Prometheus MySQL Exporter service
   ansible.builtin.service:
-    name: prometheus-mysqld-exporter
+    name: "{{ mysql_exporter_service_name }}"
     state: started
     enabled: true
+  retries: 3
+  delay: 3

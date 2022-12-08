@@ -1,67 +1,62 @@
-- name: Install BIND 9 package
+- name: Install BIND 9 packages
   ansible.builtin.apt:
-    name:
-      - bind9
-      - python3-dns
-      - python3-dnspython
+    name: "{{ bind_packages }}"
     state: latest
 
 - name: Start and enable BIND 9 service
   ansible.builtin.service:
-    name: bind9
+    name: "{{ bind_service_name }}"
     state: started
     enabled: true
 
 - name: Configure BIND 9 service
   ansible.builtin.template:
-    src: named.conf
-    dest: /etc/bind/named.conf
+    src: "{{ bind_named_conf }}"
+    dest: "{{ bind_etc_dir }}/"
   notify:
     - Restart BIND 9 service
 
 - name: Initialize BIND 9 zones
   ansible.builtin.template:
-    src: db.{{ item.domain }}
-    dest: "{{ item.file }}"
+    src: "{{ item }}"
+    dest: "{{ bind_var_dir }}/"
     force: false
-  with_items:
-    - { domain: "{{ bind_domain }}", file: "{{ bind_db_file }}" }
-    - { domain: "{{ bind_ptr_domain }}", file: "{{ bind_db_ptr_file }}" }
+  with_items: "{{ bind_zone_files }}"
   notify:
     - Reload BIND 9 configuration
 
 - name: Add BIND 9 keys
   ansible.builtin.template:
-    src: named.conf.options
-    dest: /etc/bind/
+    src: "{{ bind_named_conf_options }}"
+    dest: "{{ bind_etc_dir }}/"
   notify:
     - Reload BIND 9 configuration
 
-- name: Reload BIND 9 configuration
-  meta: flush_handlers
+- name: Force-reload BIND 9 configuration
+  ansible.builtin.meta: flush_handlers
 
-- name: Add BIND 9 {{ bind_domain }} zone records
+- name: Add BIND 9 main zone records
   community.general.nsupdate:
     key_name: "{{ bind_nsupdate_key_name }}"
-    key_algorithm: hmac-sha256
+    key_algorithm: "{{ bind_key_algorithm }}"
     key_secret: "{{ bind_nsupdate_key_secret }}"
-    server: "{{ groups['dns_masters'][0] }}"
-    zone: "{{ bind_domain }}"
-    record: "{{ item.name }}"
-    value: "{{ item.host }}"
+    server: "{{ bind_master_host }}"
+    zone: "{{ bind_main_zone }}"
+    record: "{{ item.record }}"
+    value: "{{ item.value }}"
     type: "{{ item.type }}"
-  with_items: "{{ bind_records }}"
-  when: inventory_hostname == groups['dns_masters'][0]
+  with_items: "{{ bind_main_zone_records }}"
+  when: inventory_hostname == bind_master_host
 
-- name: Add BIND 9 {{ bind_ptr_domain }} zone records
+- name: Add BIND 9 reverse zone records
   community.general.nsupdate:
     key_name: "{{ bind_nsupdate_key_name }}"
-    key_algorithm: hmac-sha256
+    key_algorithm: "{{ bind_key_algorithm }}"
     key_secret: "{{ bind_nsupdate_key_secret }}"
-    server: "{{ groups['dns_masters'][0] }}"
-    zone: "{{ bind_ptr_domain }}"
-    record: "{{ hostvars[item.host]['ansible_default_ipv4']['address'].split('.')[-2:] if item.name != 'backup' else item.host.split('.')[-2:] | join('.') }}"
-    value: "{{ item.name }}.{{ bind_domain }}."
+    server: "{{ bind_master_host }}"
+    zone: "{{ bind_reverse_zone }}"
+    record: "{{ item.record }}"
+    value: "{{ item.value }}.{{ bind_main_zone }}."
     type: PTR
-  with_items: "{{ bind_records }}"
-  when: inventory_hostname == groups['dns_masters'][0]
+  with_items: "{{ bind_reverse_zone_records }}"
+  when: inventory_hostname == bind_master_host

@@ -1,17 +1,17 @@
 - name: Install Prometheus Nginx Exporter package
   ansible.builtin.apt:
-    name: prometheus-nginx-exporter
+    name: "{{ nginx_exporter_packages }}"
     state: latest
 
 - name: Expose Prometheus Nginx Exporter service
   ansible.builtin.template:
-    src: prometheus-nginx-exporter
-    dest: /etc/default/prometheus-nginx-exporter
+    src: "{{ nginx_exporter_conf }}"
+    dest: "{{ nginx_exporter_conf_dir }}/{{ nginx_exporter_conf }}"
   notify:
     - Restart Prometheus Nginx Exporter service
 
 - name: Start and enable Prometheus Nginx Exporter service
   ansible.builtin.service:
-    name: prometheus-nginx-exporter
+    name: "{{ nginx_exporter_service_name }}"
     state: started
     enabled: true

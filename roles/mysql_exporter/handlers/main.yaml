@@ -1,4 +1,4 @@
 - name: Restart Prometheus MySQL Exporter service
   ansible.builtin.service:
-    name: prometheus-mysqld-exporter
+    name: "{{ mysql_exporter_service_name }}"
     state: restarted

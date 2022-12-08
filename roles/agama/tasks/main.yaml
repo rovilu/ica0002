@@ -8,26 +8,25 @@
   ansible.builtin.get_url:
     url: "{{ item }}"
     dest: "{{ agama_dir }}/"
-  loop: "{{ agama_urls }}"
+  with_items: "{{ agama_file_urls }}"
   notify:
-    - Restart AGAMA Docker container
+    - Restart AGAMA container
 
-- name: Build AGAMA Docker image
+- name: Build AGAMA image
   community.docker.docker_image:
     name: "{{ agama_docker_image_name }}"
     source: build
     build:
       path: "{{ agama_dir }}"
   notify:
-    - Restart AGAMA Docker container
+    - Restart AGAMA container
 
-- name: Run AGAMA Docker container
+- name: Run AGAMA container
   community.docker.docker_container:
     name: "{{ agama_docker_container_name }}"
     image: "{{ agama_docker_image_name }}"
-    published_ports: "{{ agama_host_port }}:{{ agama_container_port }}"
+    published_ports: "{{ agama_host_port }}:{{ agama_docker_container_port }}"
     env:
-      AGAMA_DATABASE_URI: mysql+pymysql://{{ mysql_agama_user }}:{{ mysql_agama_password }}@{{ mysql_host }}/{{ mysql_agama_db }}
+      AGAMA_DATABASE_URI: mysql+pymysql://{{ mysql_agama_user_username }}:{{ mysql_agama_user_password }}@{{ mysql_master_host }}/{{ mysql_agama_db_name }}
   notify:
-    - Restart AGAMA Docker container
-    - Restart MySQL service
+    - Restart AGAMA container
