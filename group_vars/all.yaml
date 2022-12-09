@@ -25,7 +25,7 @@ bind_forwarders: [ 1.1.1.1, 8.8.8.8, 9.9.9.9, 9.9.9.10 ]
 bind_etc_dir: /etc/bind
 bind_var_dir: /var/cache/bind
 bind_named_conf: named.conf
-bind_master_host: rovilu-3
+bind_packages: [ bind9, python3-dns, python3-dnspython ]
 bind_named_conf_options: named.conf.options
 bind_key_algorithm: hmac-sha256
 bind_transfer_key_name: transfer.key
@@ -48,15 +48,10 @@ bind_main_zone_records:
   - { record: web1, value: rovilu-1, type: "CNAME" }
   - { record: web2, value: rovilu-2, type: "CNAME" }
 bind_reverse_zone_records:
-  - { record: "{{ bind_host_backup_last_two_octets }}", value: backup }
-  - { record: "{{ bind_host_1_last_two_octets }}", value: rovilu-1 }
-  - { record: "{{ bind_host_2_last_two_octets }}", value: rovilu-2 }
-  - { record: "{{ bind_host_3_last_two_octets }}", value: rovilu-3 }
-bind_packages: [ bind9, python3-dns, python3-dnspython ]
-bind_host_1_last_two_octets: "{{ hostvars['rovilu-1']['ansible_default_ipv4']['address'].split('.')[-2:] | reverse | join('.') }}"
-bind_host_2_last_two_octets: "{{ hostvars['rovilu-2']['ansible_default_ipv4']['address'].split('.')[-2:] | reverse | join('.') }}"
-bind_host_3_last_two_octets: "{{ hostvars['rovilu-3']['ansible_default_ipv4']['address'].split('.')[-2:] | reverse | join('.') }}"
-bind_host_backup_last_two_octets: "{{ backup_host_ipaddr.split('.')[-2:] | reverse | join('.') }}"
+  - { record: "{{ backup_host_ipaddr.split('.')[-2:] | reverse | join('.') }}", value: backup }
+  - { record: "{{ hostvars['rovilu-1']['ansible_default_ipv4']['address'].split('.')[-2:] | reverse | join('.') }}", value: rovilu-1 }
+  - { record: "{{ hostvars['rovilu-2']['ansible_default_ipv4']['address'].split('.')[-2:] | reverse | join('.') }}", value: rovilu-2 }
+  - { record: "{{ hostvars['rovilu-3']['ansible_default_ipv4']['address'].split('.')[-2:] | reverse | join('.') }}", value: rovilu-3 }
 
 bind_exporter_packages: [ prometheus-bind-exporter ]
 bind_exporter_service_name: prometheus-bind-exporter

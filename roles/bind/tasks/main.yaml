@@ -3,12 +3,6 @@
     name: "{{ bind_packages }}"
     state: latest
 
-- name: Start and enable BIND 9 service
-  ansible.builtin.service:
-    name: "{{ bind_service_name }}"
-    state: started
-    enabled: true
-
 - name: Configure BIND 9 service
   ansible.builtin.template:
     src: "{{ bind_named_conf }}"
@@ -32,31 +26,34 @@
   notify:
     - Reload BIND 9 configuration
 
-- name: Force-reload BIND 9 configuration
-  ansible.builtin.meta: flush_handlers
+- name: Start and enable BIND 9 service
+  ansible.builtin.service:
+    name: "{{ bind_service_name }}"
+    state: started
+    enabled: true
 
 - name: Add BIND 9 main zone records
   community.general.nsupdate:
     key_name: "{{ bind_nsupdate_key_name }}"
     key_algorithm: "{{ bind_key_algorithm }}"
     key_secret: "{{ bind_nsupdate_key_secret }}"
-    server: "{{ bind_master_host }}"
+    server: "{{ groups['dns_masters'][0] }}"
     zone: "{{ bind_main_zone }}"
     record: "{{ item.record }}"
     value: "{{ item.value }}"
     type: "{{ item.type }}"
   with_items: "{{ bind_main_zone_records }}"
-  when: inventory_hostname == bind_master_host
+  when: inventory_hostname == groups['dns_masters'][0]
 
 - name: Add BIND 9 reverse zone records
   community.general.nsupdate:
     key_name: "{{ bind_nsupdate_key_name }}"
     key_algorithm: "{{ bind_key_algorithm }}"
     key_secret: "{{ bind_nsupdate_key_secret }}"
-    server: "{{ bind_master_host }}"
+    server: "{{ groups['dns_masters'][0] }}"
     zone: "{{ bind_reverse_zone }}"
     record: "{{ item.record }}"
     value: "{{ item.value }}.{{ bind_main_zone }}."
     type: PTR
   with_items: "{{ bind_reverse_zone_records }}"
-  when: inventory_hostname == bind_master_host
+  when: inventory_hostname == groups['dns_masters'][0]

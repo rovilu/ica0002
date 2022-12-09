@@ -2,7 +2,7 @@
 $TTL 2d                 ; default TTL for zone
 $ORIGIN {{ bind_reverse_zone }}.   ; base domain name
 ;
-@       IN      SOA     {{ bind_master_host }}.{{ bind_main_zone }}. hostmaster.{{ bind_main_zone }}. (
+@       IN      SOA     {{ groups['dns_masters'][0] }}.{{ bind_main_zone }}. hostmaster.{{ bind_main_zone }}. (
 			            2		; serial number
 			            604800	; refresh
 			            86400	; update retry
