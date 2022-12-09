@@ -34,5 +34,5 @@
     name: "{{ mysql_exporter_service_name }}"
     state: started
     enabled: true
-  retries: 3
-  delay: 3
+  retries: 5
+  delay: 10
