@@ -29,10 +29,12 @@
   notify:
     - Restart Prometheus MySQL Exporter service
 
+- name: Wait for Prometheus MySQL Exporter to be ready
+  ansible.builtin.pause:
+    seconds: 15
+
 - name: Start and enable Prometheus MySQL Exporter service
   ansible.builtin.service:
     name: "{{ mysql_exporter_service_name }}"
     state: started
     enabled: true
-  retries: 5
-  delay: 10
