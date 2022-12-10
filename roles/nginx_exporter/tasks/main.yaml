@@ -10,6 +10,10 @@
   notify:
     - Restart Prometheus Nginx Exporter service
 
+- name: Wait for Prometheus Nginx Exporter to be ready
+  ansible.builtin.pause:
+    seconds: 15
+
 - name: Start and enable Prometheus Nginx Exporter service
   ansible.builtin.service:
     name: "{{ nginx_exporter_service_name }}"

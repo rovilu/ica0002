@@ -26,5 +26,6 @@
     image: "{{ grafana_docker_image_name }}"
     volumes: "{{ grafana_dir }}:{{ grafana_docker_dir }}"
     published_ports: "{{ grafana_host_port }}:{{ grafana_docker_container_port }}"
+    restart_policy: always
   notify:
     - Restart Grafana container

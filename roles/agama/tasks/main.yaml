@@ -26,6 +26,7 @@
     name: "{{ agama_docker_container_name }}"
     image: "{{ agama_docker_image_name }}"
     published_ports: "{{ agama_host_port }}:{{ agama_docker_container_port }}"
+    restart_policy: always
     env:
       AGAMA_DATABASE_URI: mysql+pymysql://{{ mysql_agama_user_username }}:{{ mysql_agama_user_password }}@{{ mysql_master_host }}/{{ mysql_agama_db_name }}
   notify:

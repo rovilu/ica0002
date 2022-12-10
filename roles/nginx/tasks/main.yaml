@@ -10,6 +10,10 @@
   notify:
     - Restart Nginx service
 
+- name: Wait for Nginx to be ready
+  ansible.builtin.pause:
+    seconds: 15
+
 - name: Start and enable Nginx service
   ansible.builtin.service:
     name: "{{ nginx_service_name }}"
