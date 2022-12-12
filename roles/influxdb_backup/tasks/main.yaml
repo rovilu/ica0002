@@ -13,7 +13,7 @@
     minute: "{{ item.minute }}"
     user: "{{ backup_user_username }}"
     cron_file: "{{ influxdb_backup_cron_file }}"
-    job: rm -rf {{ influxdb_backup_dir }}/* && influxd backup -portable -database {{ telegraf_influxdb_db_name }} {{ influxdb_backup_dir }} && duplicity --no-encryption full {{ influxdb_backup_dir }} rsync://{{ backup_host_user_username }}@{{ backup_host_fqdn }}/{{ influxdb_backup_host_dir }}"
+    job: rm -rf {{ influxdb_backup_dir }}/* && influxd backup -portable -database {{ telegraf_influxdb_db_name }} {{ influxdb_backup_dir }} && duplicity --no-encryption full {{ influxdb_backup_dir }} rsync://{{ backup_host_user_username }}@{{ backup_host_fqdn }}/{{ influxdb_backup_host_dir }}
   with_items:
     - { name: InfluxDB full backup, type: full, weekday: 0, hour: 0, minute: "*" }
     - { name: InfluxDB incremental backup, type: incremental, weekday: 0-6, hour: "*", minute: "*/1" }
