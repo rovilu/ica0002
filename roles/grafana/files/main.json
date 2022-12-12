@@ -24,7 +24,7 @@
   "editable": true,
   "fiscalYearStartMonth": 0,
   "graphTooltip": 0,
-  "id": 1,
+  "id": 3,
   "links": [],
   "liveNow": false,
   "panels": [
@@ -915,7 +915,7 @@
       },
       "gridPos": {
         "h": 8,
-        "w": 6,
+        "w": 8,
         "x": 0,
         "y": 32
       },
@@ -1007,8 +1007,8 @@
       },
       "gridPos": {
         "h": 8,
-        "w": 6,
-        "x": 6,
+        "w": 8,
+        "x": 8,
         "y": 32
       },
       "id": 20,
@@ -1032,7 +1032,7 @@
           },
           "editorMode": "code",
           "expr": "haproxy_server_up",
-          "legendFormat": "{{ instance }}",
+          "legendFormat": "{{ instance }}-{{ server }}",
           "range": true,
           "refId": "A"
         }
@@ -1099,8 +1099,8 @@
       },
       "gridPos": {
         "h": 8,
-        "w": 12,
-        "x": 12,
+        "w": 8,
+        "x": 16,
         "y": 32
       },
       "id": 22,
