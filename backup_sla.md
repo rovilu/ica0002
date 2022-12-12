@@ -15,22 +15,22 @@ to be covered with backup.
 
 See table below to get more information about backup coverage.
 
-| Service type            | Service                      | Backup-covered | Description                                                                                                       |
-|-------------------------|------------------------------|----------------|-------------------------------------------------------------------------------------------------------------------|
-| Web Application         | AGAMA                        | No             | Stateless application which stores its data in MySQL database                                                     |
-| DNS Server              | BIND 9                       | No             | Stateless service and does not store critical data                                                                |
-| Monitoring Agent        | Prometheus BIND Exporter     | No             | Service exports collected data to Prometheus server and does not store it internally                              |
-| Data Visualization Tool | Grafana                      | No             | Application visualize data from datasources and does not store it internally                                      |
-| Database                | InfluxDB                     | Yes            | Database stores critical data that cannot be lost. All database files must be backed up                           |
-| Monitoring Agent        | Prometheus InfluxDB Exporter | No             | Service exports collected data to Prometheus server and does not store it internally                              |
-| Database                | MySQL                        | Yes            | Database stores critical data that cannot be lost. All database files must be backed up                           |
-| Monitoring Agent        | Prometheus MySQL Exporter    | No             | Service exports collected data to Prometheus server and does not store it internally                              |
-| Web Server              | Nginx                        | No             | Stateless service and does not store critical data                                                                |
-| Monitoring Agent        | Prometheus Nginx Exporter    | No             | Service exports collected data to Prometheus server and does not store it internally                              |
-| Monitoring Agent        | Prometheus Node Exporter     | No             | Service exports collected data to Prometheus server and does not store it internally                              |
-| Monitoring Tool         | Pinger                       | No             | Stateless service which stores its data in MySQL database                                                         |
-| Monitoring Server       | Prometheus                   | Yes            | Service has internal database that contains metric data that cannot be lost. All database files must be backed up |
-| Application Server      | uWSGI                        | No             | Stateless service and does not store critical data                                                                |
+| Service type            | Service                      | Backup-covered | Description                                                                             |
+|-------------------------|------------------------------|----------------|-----------------------------------------------------------------------------------------|
+| Web Application         | AGAMA                        | No             | Stateless application which stores its data in MySQL database                           |
+| DNS Server              | BIND 9                       | No             | Stateless service and does not store critical data                                      |
+| Monitoring Agent        | Prometheus BIND Exporter     | No             | Service exports collected data to Prometheus server and does not store it internally    |
+| Data Visualization Tool | Grafana                      | No             | Application visualize data from datasources and does not store it internally            |
+| Database                | InfluxDB                     | Yes            | Database stores critical data that cannot be lost. All database files must be backed up |
+| Monitoring Agent        | Prometheus InfluxDB Exporter | No             | Service exports collected data to Prometheus server and does not store it internally    |
+| Database                | MySQL                        | Yes            | Database stores critical data that cannot be lost. All database files must be backed up |
+| Monitoring Agent        | Prometheus MySQL Exporter    | No             | Service exports collected data to Prometheus server and does not store it internally    |
+| Web Server              | Nginx                        | No             | Stateless service and does not store critical data                                      |
+| Monitoring Agent        | Prometheus Nginx Exporter    | No             | Service exports collected data to Prometheus server and does not store it internally    |
+| Monitoring Agent        | Prometheus Node Exporter     | No             | Service exports collected data to Prometheus server and does not store it internally    |
+| Monitoring Tool         | Pinger                       | No             | Stateless service which stores its data in MySQL database                               |
+| Monitoring Tool         | Prometheus                   | No             | Service does not store any critical data needed for a long time.                        |
+| Application Server      | uWSGI                        | No             | Stateless service and does not store critical data                                      |
 
 
 ## RPO and RTO
