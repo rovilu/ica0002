@@ -23,11 +23,12 @@
 
 - name: Run AGAMA container
   community.docker.docker_container:
-    name: "{{ agama_docker_container_name }}"
+    name: "{{ agama_docker_container_name }}{{ item }}"
     image: "{{ agama_docker_image_name }}"
-    published_ports: "{{ agama_host_port }}:{{ agama_docker_container_port }}"
+    published_ports: "{{ agama_host_port_prefix }}{{ item }}:{{ agama_docker_container_port }}"
     restart_policy: always
     env:
       AGAMA_DATABASE_URI: mysql+pymysql://{{ mysql_agama_user_username }}:{{ mysql_agama_user_password }}@{{ mysql_master_host }}/{{ mysql_agama_db_name }}
+  loop: "{{ range(1, agama_docker_container_replica_count + 1) }}"
   notify:
     - Restart AGAMA container

@@ -1,4 +1,5 @@
 - name: Restart AGAMA container
   community.docker.docker_container:
-    name: "{{ agama_docker_container_name }}"
+    name: "{{ agama_docker_container_name }}{{ item }}"
     restart: true
+  loop: "{{ range(1, agama_docker_container_replica_count + 1) }}"

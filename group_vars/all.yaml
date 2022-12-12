@@ -1,9 +1,10 @@
 agama_dir: /opt/agama
-agama_host_port: 8001
+agama_host_port_prefix: 800
 agama_app_url: https://raw.githubusercontent.com/hudolejev/agama/master/agama.py
 agama_dockerfile_url: https://raw.githubusercontent.com/hudolejev/agama/master/Dockerfile
 agama_docker_image_name: agama
 agama_docker_container_name: agama
+agama_docker_container_replica_count: 2
 agama_docker_build_path: "{{ agama.dir }}"
 agama_docker_container_port: 8000
 agama_file_urls: [ "{{ agama_app_url }}", "{{ agama_dockerfile_url }}" ]
