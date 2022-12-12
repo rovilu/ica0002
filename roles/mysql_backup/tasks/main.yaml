@@ -33,6 +33,6 @@
     cron_file: "{{ mysql_backup_cron_file }}"
     job: rm -rf {{ mysql_backup_dir }}/* && mysqldump {{ mysql_agama_db_name }} > {{ mysql_backup_dir }}/{{ mysql_agama_db_name }}.sql && duplicity --no-encryption {{ item.type }} {{ mysql_backup_dir }} rsync://{{ backup_host_user_username }}@{{ backup_host_fqdn }}/{{ mysql_backup_host_dir }}
   with_items:
-    - { name: MySQL full backup, type: full, weekday: 0, minutes: * }
-    - { name: MySQL incremental backup, type: incremental, weekday: 0-6, minutes: 0-59 }
+    - { name: MySQL full backup, type: full, weekday: 0 }
+    - { name: MySQL incremental backup, type: incremental, weekday: 1-6 }
   when: inventory_hostname == mysql_backup_host
