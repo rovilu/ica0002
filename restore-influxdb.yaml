@@ -24,7 +24,7 @@
         influxd restore -portable -database {{ telegraf_influxdb_db_name }} {{ influxdb_backup_restore_dir }}
       ignore_errors: true
 
-    - name: Stop Telegraf service
+    - name: Start Telegraf service
       ansible.builtin.service:
         name: "{{ telegraf_service_name }}"
         state: started
