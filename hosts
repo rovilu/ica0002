@@ -1,6 +1,6 @@
-rovilu-1 ansible_host=193.40.156.67 ansible_port=11222
-rovilu-2 ansible_host=193.40.156.67 ansible_port=33222
-rovilu-3 ansible_host=193.40.156.67 ansible_port=22122
+rovilu-1 ansible_host=193.40.156.67 ansible_port=1222
+rovilu-2 ansible_host=193.40.156.67 ansible_port=3222
+rovilu-3 ansible_host=193.40.156.67 ansible_port=2122
 
 [web_servers]
 rovilu-1
