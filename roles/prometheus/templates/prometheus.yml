@@ -10,7 +10,6 @@ alerting:
         - targets: ['localhost:9093']
 
 scrape_configs:
-
   - job_name: prometheus
     scrape_interval: 5s
     scrape_timeout: 5s
