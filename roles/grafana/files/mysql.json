@@ -334,7 +334,7 @@
           "editorMode": "code",
           "expr": "mysql_slave_status_slave_sql_running",
           "interval": "",
-          "legendFormat": "Slave: {{ instance }} | Master: {{ master_host }}",
+          "legendFormat": "{{ instance }}",
           "range": true,
           "refId": "A"
         }
@@ -491,7 +491,7 @@
           },
           "editorMode": "code",
           "expr": "mysql_slave_status_slave_io_running",
-          "legendFormat": "Slave: {{ instance }} | Master: {{ master_host }}",
+          "legendFormat": "{{ instance }}",
           "range": true,
           "refId": "A"
         }
@@ -515,6 +515,6 @@
   "timezone": "",
   "title": "MySQL",
   "uid": "5jA4L2DVz",
-  "version": 1,
+  "version": 2,
   "weekStart": ""
 }
