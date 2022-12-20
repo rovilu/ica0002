@@ -23,6 +23,10 @@
   notify:
     - Restart Telegraf service
 
+- name: Wait for Telegraf to be ready
+  ansible.builtin.pause:
+    seconds: 15
+
 - name: Start and enable Telegraf service
   ansible.builtin.service:
     name: "{{ telegraf_service_name }}"
