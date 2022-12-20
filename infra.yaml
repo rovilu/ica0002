@@ -4,12 +4,14 @@
     - { role: setup, tags: setup }
     - { role: init, tags: init }
     - { role: backup, tags: backup }
+  diff: false
 
 - name: Deploy DNS servers
   hosts: dns_servers
   roles:
     - { role: bind, tags: bind }
     - { role: bind_exporter, tags: bind_exporter }
+  diff: false
 
 - name: Configure hosts
   hosts: all
@@ -17,12 +19,14 @@
     - { role: resolv, tags: resolv }
     - { role: node_exporter, tags: node_exporter }
     - { role: rsyslog, tags: rsyslog }
+  diff: false
 
 - name: Deploy Nginx servers
   hosts: nginx_servers
   roles:
     - { role: nginx, tags: nginx }
     - { role: nginx_exporter, tags: nginx_exporter }
+  diff: false
 
 - name: Deploy database servers
   hosts: db_servers
@@ -30,11 +34,13 @@
     - { role: mysql, tags: mysql }
     - { role: mysql_backup, tags: mysql_backup }
     - { role: mysql_exporter, tags: mysql_exporter }
+  diff: false
 
 - name: Deploy Docker hosts
   hosts: docker_hosts
   roles:
     - { role: docker, tags: docker }
+  diff: false
 
 - name: Deploy HAProxy hosts
   hosts: haproxy_servers
@@ -43,11 +49,13 @@
     - { role: keepalived_exporter, tags: keepalived_exporter }
     - { role: haproxy, tags: haproxy }
     - { role: haproxy_exporter, tags: haproxy_exporter }
+  diff: false
 
 - name: Deploy web servers
   hosts: web_servers
   roles:
     - { role: agama, tags: agama }
+  diff: false
 
 - name: Deploy monitoring servers
   hosts: monitoring_servers
@@ -59,3 +67,4 @@
     - { role: influxdb_backup, tags: influxdb_backup }
     - { role: pinger, tags: pinger }
     - { role: influxdb_exporter, tags: influxdb_exporter }
+  diff: false
