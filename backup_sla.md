@@ -33,17 +33,23 @@ See table below to get more information about backup coverage.
 | Application Server      | uWSGI                        | No             | Stateless service and does not store critical data                                      |
 
 
-## RPO and RTO
-Due to infrastructure hosts the only application for now and the application is not actively in use,
-it is acceptable to prepare for recovery within an hour since disruption occurred.
+## Recovery Point Objective (RPO)
+Due to infrastructure hosts the only application for now and the application is 
+not actively in use, the acceptable value of data loss threshold is **24 hours**.
 
-The access to service and data must be able to be regained within 2 hours since disruption occurred.
+
+## Recovery Time Objective (RTO)
+In case of disaster, normal services must be restored in normal state within **6 hours**.
 
 
 ## Versioning and retention
-Backup is valuable within 7 days since the first version. Full backup is conducted every week on Sunday 00:00.
-Incremental backup is conducted on Monday to Saturday 00:00.
-According to retention and backup intervals there are 7 versions of single backup.
+A specific backup is valuable within 7 days since the first version.
+Full backup is conducted every week on Sunday 00:00 UTC.
+
+Incremental backup is conducted on Monday to Saturday 00:00 UTC.
+
+According to retention and backup intervals there are 7 versions of single backup: 1 full and 6 incremental ones.
+The next full backup makes the previous one with its incremental versions invaluable.
 
 
 ## Backup usability check
@@ -51,7 +57,7 @@ In order to verify usability of backup, the following checks must be conducted:
 1) Backup created in time predefined to its version
 2) Backup is readable and ready to be used. Use test server to conduct test recovery
 3) Backup is compatible with infrastructure services and applications.
-Use test server to check if data from backup can be used by serviced and applications.
+Use test server to check if data from backup can be used by services and applications.
 
 
 ## Restoration criteria
